@@ -77,8 +77,26 @@ sub new($$;$) {
   my $device = shift;
   my $opt = shift || {cut=>1, mirror=>0, feed=>4};
 
+  my $usb = Device::USB->new();
+  my $dev = $usb->find_device( 0x04f9, 0x202d) || die "couldn't find device";
+
+ printf "Device: %04X:%04X\n", $dev->idVendor(), $dev->idProduct();
+    print "Manufactured by ", $dev->manufacturer(), "\n",
+          " Product: ", $dev->product(), "\n";
+ $dev->open();
+ my $cfg = $dev->config()->[0];
+ print "Config:", $cfg->iConfiguration(), ": interface count: ",
+       $cfg->bNumInterfaces(), "\n";
+ my $inter = $cfg->interfaces()->[0]->[0];
+ print "Interface:", $inter->bInterfaceNumber(),
+       " name: ", $dev->get_string_simple($inter->iInterface()), 
+       ": endpoint count: ", $inter->bNumEndpoints(), "\n";
+my $ep = $inter->endpoints()->[0];
+print "Endpoint:", $ep->bEndpointAddress(), " name: ", $dev->get_string_simple($inter->iInterface()), "\n";
+
+  my $port = $dev;
 #  my $port = new Device::SerialPort ($device) or die "Can't open $device: $!\n";
-  open my $port, "+<", "$device";
+#  open my $port, "+<", "$device";
 #  binmode $port;
 #  $port->baudrate(57600); # This is the default speed, consult Brother docs for baudrate changing protocol
 #  $port->parity("none");

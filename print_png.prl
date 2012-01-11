@@ -8,8 +8,87 @@ use Getopt::Long;
 my $printername = "Brother_PT-2430PC";
 GetOptions("P=s" => \$printername);
 
+# This maps the tape width from mm to pixels
+# Note that we use a 2 pixel (one in each side) margin,
+# the Brother driver uses a much wider margin.
+my %WIDTH =
+    (
+     6=>42-2,
+     9=>64-2,
+     12=>84-2,
+     18=>128-2,
+     24=>128,
+     );
+
 my $data = GD::Image->newFromPng($ARGV[0]) || die "can't open image";
 
+my %cfg = (
+    tapewidth => 12,
+    error => undef,
+);
+my $opt = {cut=>1, mirror=>0, feed=>4};
+
+
+# This will print a number of pages, each one a GD image.
+sub pprint {
+    my $self = \%cfg;
+    
+    my $out = "";
+
+    while (@_ and !$self->{error}) {
+	my $img = shift @_;
+
+	my ($w,$h) = $img->getBounds();
+	my $y0 = 64-$h / 2;
+	for my $x (0..$w-1) {
+	    my @bytes;
+	    for my $x (0..15) {
+		push @bytes, 0;
+	    }
+
+	    for my $y (0..127) {
+		my $set = $y > 64-$WIDTH{$self->{tapewidth}}/2 && $y < 64+$WIDTH{$self->{tapewidth}}/2;
+		$set = 0 if ($img->getPixel($x,$y-$y0) || $y - $y0 < 0  || $y - $y0 >= $h);
+		if ($set) {
+		    my $bit = 2** (7-($y % 8));
+		    $bytes[int($y / 8)] |= $bit;
+		}
+	    }
+
+	    # Chop off the bytes that are zero, this cuts down on rs323 bandwidth.
+	    while (@bytes and !$bytes[@bytes-1]) {
+		pop @bytes;
+	    }
+
+	    if (!@bytes) {
+                #$self->{port}->write('Z'); # All bytes were zero
+                $out .= 'Z';
+	    } else {
+		my $data = join '', map {chr} @bytes;
+                #$self->{port}->write('G'.chr(@bytes).chr(0).$data);
+		$out .= 'G'.chr(@bytes).chr(0).$data;
+	    }
+            #  usleep(500); # This seems to make it much more reliable...
+	}
+
+	if (@_) {
+            #$self->{port}->write(chr(0x0C)); # There are more pages to print, don't discharge.
+	    $out .= chr(0x0C); # There are more pages to print, don't discharge.
+	} else {
+            #$self->{port}->write(chr(0x1A)); # This is the last page, discharge.
+	    $out .= chr(0x1A); # This is the last page, discharge.
+	}
+
+	# Wait for the page to print
+        #my $done = 0;
+        #while (!$done) {
+        #    if ($self->readstatus(10)) {
+        #	$done = 1 if $self->{sk} == 1;
+        #    }
+        #}
+    }
+    return $out;
+}
 # 0: gd image object
 sub processimage {
     my $inputimage=$_[0];
@@ -54,6 +133,10 @@ sub initialize {
     $output=chr(0x1B).'@';
     $output=$output.chr(0x1B).'iS';
     $output=$output.chr(0x1B).'iR'.chr(0x01);
+    #  my $output = chr(0x1B).'@';              # Initialize
+     my $mode = ($opt->{feed}||0) & 31 | $opt->{cut} ? 64 : 0 | $opt->{mirror} ? 128 : 0;
+      $output .= chr(0x1B).'iM'.chr($mode);  # Set mode
+    #   $output .= chr(0x1B).'iR'.chr(1);      # Set raster mode
     return $output;
 }
 
@@ -68,13 +151,14 @@ sub linefeed {
     return $output;
 }
 
-my $rawdata=processimage($data);
+#my $rawdata=processimage($data);
+my $rawdata=pprint($data,$data,$data);
 
 open my $printer, "| lpr -P".$printername;
 #open my $printer, ">out.print";
 binmode $printer;
 print $printer initialize();
 print $printer $rawdata;
-print $printer linefeed(5);
+#print $printer linefeed(5);
 close($printer);
 
