@@ -1,0 +1,79 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+
+use GD;
+use Getopt::Long;
+
+my $printername = "Brother_PT-2430PC";
+GetOptions("P=s" => \$printername);
+
+my $data = GD::Image->newFromPng($ARGV[0]) || die "can't open image";
+
+# 0: gd image object
+sub processimage {
+  my $inputimage=$_[0];
+  $inputimage=$inputimage->copyRotate90(); # we turn it 90 degrees before anything else...
+  my $charcount;
+  my $x;
+  my $y;
+  my @pixel=();
+  my ($width,$height)=$inputimage->getBounds();
+  my $pixelgroups;
+  my $output="";
+
+  # I found no perfectly working way of turning pango's antialiasing off, so we'll handle
+  # the gray -> bw conversion here.
+  for ($y=$height-1; $y>-1; $y--) {
+    for ($x=$width/8; $x>-1; $x--) {
+      my @inpixels=();
+      foreach (0..7) {
+        my $tmpcolor=$inputimage->getPixel(($x*8)+$_,$y);
+        my ($r, $g, $b)=$inputimage->rgb($tmpcolor);
+        if ($r<150) { # it's B/W, so we only need to compare one value
+          $inpixels[$_]=1;
+        } else {
+          $inpixels[$_]=0;
+        }
+      }
+
+      $pixel[$x]=ord(pack('B8', $inpixels[0].$inpixels[1].$inpixels[2].$inpixels[3].$inpixels[4].$inpixels[5].$inpixels[6].$inpixels[7]));
+    }
+
+    $output=$output.'G'.chr(($width/8)+4).chr(0x00).chr(0x00).chr(0x00).chr(0x00).chr(0x00);
+    for ($pixelgroups=0; $pixelgroups<($width/8); $pixelgroups++) {
+      $output=$output.chr($pixel[$pixelgroups]);
+    }
+  }
+  return $output;
+}
+
+sub initialize {
+  my $output;
+  $output=chr(0x1B).'@';
+  $output=$output.chr(0x1B).'iS';
+  $output=$output.chr(0x1B).'iR'.chr(0x01);
+  return $output;
+}
+
+sub linefeed {
+  my $feedcount=$_[0];
+  my $output="";
+
+  foreach (0..$feedcount) {
+    $output=$output."Z";
+  }
+  $output=$output.chr(0x1A);
+  return $output;
+}
+
+my $rawdata=processimage($data);
+
+#open my $printer, "| lpr -P".$printername;
+open my $printer, ">out.print";
+binmode $printer;
+print $printer initialize();
+print $printer $rawdata;
+print $printer linefeed(5);
+close($printer);
+
