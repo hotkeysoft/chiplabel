@@ -25,9 +25,10 @@ sub processimage {
     # I found no perfectly working way of turning pango's antialiasing off, so we'll handle
     # the gray -> bw conversion here.
     for ($y=$height-1; $y>-1; $y--) {
-        for ($x=$width/8; $x>-1; $x--) {
+        for ($x=($width + 7)/8; $x>-1; $x--) {
             my @inpixels=();
             foreach (0..7) {
+                ($inpixels[$_] = 1),next  if $x*8 + $_ >= $width;
                 my $tmpcolor=$inputimage->getPixel(($x*8)+$_,$y);
                 my ($r, $g, $b)=$inputimage->rgb($tmpcolor);
                 if ($r<150) { # it's B/W, so we only need to compare one value
@@ -40,8 +41,8 @@ sub processimage {
             $pixel[$x]=ord(pack('B8', $inpixels[0].$inpixels[1].$inpixels[2].$inpixels[3].$inpixels[4].$inpixels[5].$inpixels[6].$inpixels[7]));
         }
 
-        $output=$output.'G'.chr(($width/8)+4).chr(0x00).chr(0x00).chr(0x00).chr(0x00).chr(0x00);
-        for ($pixelgroups=0; $pixelgroups<($width/8); $pixelgroups++) {
+        $output .= 'g'.chr(0).chr((($width + 7)/8)+4).chr(0x00).chr(0x00).chr(0x00).chr(0x00).chr(0x00);
+        for ($pixelgroups=0; $pixelgroups<(($width + 7)/8); $pixelgroups++) {
             $output=$output.chr($pixel[$pixelgroups]);
         }
     }

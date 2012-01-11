@@ -1,0 +1,2 @@
+/dev/bus/usb/005/008
+/usr/share/fonts/truetype/freefont/FreeSans.ttf
