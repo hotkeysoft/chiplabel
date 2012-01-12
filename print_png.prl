@@ -25,7 +25,7 @@ my %cfg = (
     tapewidth => 24,
     error => undef,
 );
-my $opt = {cut=>1, mirror=>0, feed=>4};
+my $opt = {cut=>1, mirror=>0, feed=>0};
 
 
 # returns true if pixel is black, zero if it is white or undef if out of bounds.
@@ -51,16 +51,14 @@ sub pprint {
 	    }
 	    for my $y (0..127) {
 		my $set = $y > 64-$WIDTH{$self->{tapewidth}}/2 && $y < 64+$WIDTH{$self->{tapewidth}}/2;
-		$set = 0 unless checkPixel($img, $x, $y - $y0); # ($img->getPixel($x,$y-$y0) || $y - $y0 < 0  || $y - $y0 >= $h);
+		$set = 0 unless checkPixel($img, $x, $y - $y0);
 		if ($set) {
 		    my $bit = 2** (7-($y % 8));
 		    $bytes[int($y / 8)] |= $bit;
 		}
 	    }
-	    # Chop off the bytes that are zero, this cuts down on rs323 bandwidth.
-	    while (@bytes and !$bytes[@bytes-1]) {
-		pop @bytes;
-	    }
+	    # Chop off the bytes that are zero.
+	    pop @bytes while @bytes and !$bytes[@bytes-1];
 
 	    if (!@bytes) {
                 $out .= 'Z';
@@ -87,8 +85,9 @@ sub initialize {
     return $output;
 }
 
-my $data = GD::Image->newFromPng($ARGV[0]) || die "can't open image";
-my $rawdata=pprint($data);
+#my $data = GD::Image->newFromPng($ARGV[0]) || die "can't open image";
+#my $rawdata=pprint($data);
+my $rawdata=pprint(map { GD::Image->newFromPng($_) } @ARGV);
 open my $printer, "| lpr -P".$printername;
 #open my $printer, ">out.print";
 binmode $printer;
