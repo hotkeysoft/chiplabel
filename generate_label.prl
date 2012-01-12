@@ -6,7 +6,7 @@ use GD;
 use GD::Barcode::QRcode;
 use Getopt::Long;
 
-my $font = "Ariel-10";
+my $font = "Ariel";
 #my $text = "Hello, World!";
 my $text = "\n John Meacham\n  626-379-6981\n  john\@foo.net";
 my $qrtext = "MECARD:N:Meacham,John;TEL:626-379-6981;EMAIL:john\@foo.net;;";
