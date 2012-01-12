@@ -28,12 +28,20 @@ my %cfg = (
 my $opt = {cut=>1, mirror=>0, feed=>4};
 
 
+# returns true if pixel is black, zero if it is white or undef if out of bounds.
+sub checkPixel {
+    my ($img,$x,$y) = @_;
+    my ($w,$h) = $img->getBounds();
+    return undef if $x < 0 || $x >= $w || $y < 0 || $y >= $h;
+    my ($r,$g,$b) = $img->rgb($img->getPixel($x,$y));
+    return $r + $g + $b > 127*3 ? 0 : 1;
+}
+
 sub pprint {
     my $self = \%cfg;
     my $out = "";
     while (@_ and !$self->{error}) {
 	my $img = shift @_;
-
 	my ($w,$h) = $img->getBounds();
 	my $y0 = 64 - $h/2;
 	for my $x (0..$w-1) {
@@ -41,16 +49,14 @@ sub pprint {
 	    for my $x (0..15) {
 		push @bytes, 0;
 	    }
-
 	    for my $y (0..127) {
 		my $set = $y > 64-$WIDTH{$self->{tapewidth}}/2 && $y < 64+$WIDTH{$self->{tapewidth}}/2;
-		$set = 0 if ($img->getPixel($x,$y-$y0) || $y - $y0 < 0  || $y - $y0 >= $h);
+		$set = 0 unless checkPixel($img, $x, $y - $y0); # ($img->getPixel($x,$y-$y0) || $y - $y0 < 0  || $y - $y0 >= $h);
 		if ($set) {
 		    my $bit = 2** (7-($y % 8));
 		    $bytes[int($y / 8)] |= $bit;
 		}
 	    }
-
 	    # Chop off the bytes that are zero, this cuts down on rs323 bandwidth.
 	    while (@bytes and !$bytes[@bytes-1]) {
 		pop @bytes;
@@ -63,7 +69,6 @@ sub pprint {
 		$out .= 'G'.chr(@bytes).chr(0).$data;
 	    }
 	}
-
 	if (@_) {
 	    $out .= chr(0x0C); # There are more pages to print, don't discharge.
 	} else {
