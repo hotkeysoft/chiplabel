@@ -5,8 +5,21 @@ use warnings;
 use GD;
 use Getopt::Long;
 
+my $tapewidth = 12;
+my $cut = 0;
+my $count = 1;
+my $out = undef;
+my $mirror = 0;
+
 my $printername = "Brother_PT-2430PC";
-GetOptions("P=s" => \$printername);
+GetOptions(
+    "P=s" => \$printername,
+    "w=n" => \$tapewidth,
+    c => \$cut,
+    "n=n" => \$count,
+    "o=s" => \$out
+    m => \$mirror
+    );
 
 # This maps the tape width from mm to pixels
 # Note that we use a 2 pixel (one in each side) margin,
@@ -20,13 +33,7 @@ my %WIDTH =
      24=>128,
      );
 
-
-my %cfg = (
-    tapewidth => 24,
-    error => undef,
-);
-my $opt = {cut=>1, mirror=>0, feed=>0};
-
+my $opt = {cut=>$cut, mirror=>$mirror, feed=>0};
 
 # returns true if pixel is black, zero if it is white or undef if out of bounds.
 sub checkPixel {
@@ -38,9 +45,8 @@ sub checkPixel {
 }
 
 sub pprint {
-    my $self = \%cfg;
     my $out = "";
-    while (@_ and !$self->{error}) {
+    while (@_) {
 	my $img = shift @_;
 	my ($w,$h) = $img->getBounds();
 	my $y0 = 64 - $h/2;
@@ -50,7 +56,7 @@ sub pprint {
 		push @bytes, 0;
 	    }
 	    for my $y (0..127) {
-		my $set = $y > 64-$WIDTH{$self->{tapewidth}}/2 && $y < 64+$WIDTH{$self->{tapewidth}}/2;
+		my $set = $y > 64-$WIDTH{$tapewidth}/2 && $y < 64+$WIDTH{$tapewidth}/2;
 		$set = 0 unless checkPixel($img, $x, $y - $y0);
 		if ($set) {
 		    my $bit = 2** (7-($y % 8));
@@ -80,17 +86,18 @@ sub initialize {
     my $output=chr(0x1B).'@';
     $output .= chr(0x1B).'iS';
     $output .= chr(0x1B).'iR'.chr(0x01);
-    my $mode = ($opt->{feed}||0) & 31 | $opt->{cut} ? 64 : 0 | $opt->{mirror} ? 128 : 0;
+    my $mode =  $cut ? 64 : 0 | $mirror ? 128 : 0;
     $output .= chr(0x1B).'iM'.chr($mode);  # Set mode
     return $output;
 }
 
-#my $data = GD::Image->newFromPng($ARGV[0]) || die "can't open image";
-#my $rawdata=pprint($data);
-my $rawdata=pprint(map { GD::Image->newFromPng($_) } @ARGV);
-open my $printer, "| lpr -P".$printername;
-#open my $printer, ">out.print";
-binmode $printer;
-print $printer initialize();
-print $printer $rawdata;
-close($printer);
+my $rawdata=pprint(map { (GD::Image->newFromPng($_)) x $count } @ARGV);
+if (defined $out) {
+open PRINT, ">", $out or die "$!: $out";
+} else {
+open PRINT, "| lpr -P$printername" or die "$!: | lpr -P$printername";
+}
+binmode PRINT;
+print PRINT initialize();
+print PRINT $rawdata;
+close PRINT;

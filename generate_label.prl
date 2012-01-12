@@ -11,6 +11,7 @@ my $fsize = 18;
 my $outfile = "label.png";
 my $text = "\n John Meacham\n  626-379-6981\n  john\@foo.net";
 my $qrtext = "MECARD:N:Meacham,John;TEL:626-379-6981;EMAIL:john\@foo.net;;";
+#my $qrtext = "foo.net/d/foo.pdf";
 
 # tape width in mm
 my $tapewidth = 12;
