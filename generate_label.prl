@@ -6,12 +6,13 @@ use GD;
 use GD::Barcode::QRcode;
 use Getopt::Long;
 
+#my $font = "./FreeSans.ttf";
+my $font = "Times:Italic";
 my $text = "Hello, World!";
 #my $text = "Hello, World! This is a test of the emergency broadcast system!";
 
 # tape width in mm
-my $tapewidth = 12;
-
+my $tapewidth = 24;
 
 # This maps the tape width from mm to pixels
 # Note that we use a 2 pixel (one in each side) margin,
@@ -25,18 +26,53 @@ my %WIDTH =
      24=>128,
      );
 
+my $codeside = $WIDTH{$tapewidth};
+
 my $code = GD::Barcode::QRcode->new($text, { Ecc => 'L', Version => 1 })->plot();
+$code->useFontConfig(1);
 
 printf "QRBounds(%i,%i)\n", $code->getBounds;
 
-my $resized = GD::Image->new($WIDTH{$tapewidth}, $WIDTH{$tapewidth});
+#my $img = GD::Image->new();
+#my $bg = $img->colorAllocate(255,255,255);
+#my $fg = $img->colorAllocate(0,0,0);
+#my @tbounds = $img->stringFT($fg, $font, 18, 0, 0, 64, $text);
 
-$resized->copyResized($code, 0,0,0,0, $WIDTH{$tapewidth}, $WIDTH{$tapewidth}, ($code->getBounds()));
+
+#print "Text($tw,$th) ", join " ", @tbounds ," \n";
+
+my $tgd = drawtext($text);
+my ($tw,$th) = $tgd->getBounds();
+
+my $img = GD::Image->new($codeside + $tw, $codeside);
+my $bg = $img->colorAllocate(255,255,255);
+my $fg = $img->colorAllocate(0,0,0);
+
+$img->copy($tgd,0,0,0,0, ($tgd->getBounds()));
+$img->copyResized($code,$tw,0,0,0, $codeside, $codeside, ($code->getBounds()));
+
+#my $resized = GD::Image->new($WIDTH{$tapewidth}, $WIDTH{$tapewidth});
+
+#$resized->copyResized($code, 0,0,0,0, $WIDTH{$tapewidth}, $WIDTH{$tapewidth}, ($code->getBounds()));
 
 open my $fh, ">", "code.png";
 binmode $fh;
-print $fh $resized->png;
+print $fh $img->png;
 close $fh;
 
 #$code->save("code.png", "png");
 
+sub drawtext {
+    my ($text) = @_;
+#    my $timg = GD::Image->new();
+    #   $timg->useFontConfig(1);
+    #   my @tb = $timg->stringFT($timg->colorAllocate(0,0,0), $font, 24, 0, 0, 0, $text);
+    my @tb = GD::Image->stringFT(0, $font, 24, 0, 0, 0, $text);
+    my ($tw,$th) = ($tb[2] - $tb[6], $tb[3] - $tb[7]);
+    print "Text($tw,$th) ", join " ", @tb ," \n";
+    my $img = GD::Image->new($tw,$th);
+    my $bg = $img->colorAllocate(255,255,255);
+    my $fg = $img->colorAllocate(0,0,0);
+    $img->stringFT(-$fg, $font, 18, 0, -$tb[6], -$tb[7], $text);
+    return $img;
+}
