@@ -20,10 +20,9 @@ my %WIDTH =
      24=>128,
      );
 
-my $data = GD::Image->newFromPng($ARGV[0]) || die "can't open image";
 
 my %cfg = (
-    tapewidth => 12,
+    tapewidth => 24,
     error => undef,
 );
 my $opt = {cut=>1, mirror=>0, feed=>4};
@@ -83,8 +82,8 @@ sub initialize {
     return $output;
 }
 
+my $data = GD::Image->newFromPng($ARGV[0]) || die "can't open image";
 my $rawdata=pprint($data);
-
 open my $printer, "| lpr -P".$printername;
 #open my $printer, ">out.print";
 binmode $printer;

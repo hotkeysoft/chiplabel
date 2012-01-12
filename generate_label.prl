@@ -1,0 +1,42 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+
+use GD;
+use GD::Barcode::QRcode;
+use Getopt::Long;
+
+my $text = "Hello, World!";
+#my $text = "Hello, World! This is a test of the emergency broadcast system!";
+
+# tape width in mm
+my $tapewidth = 12;
+
+
+# This maps the tape width from mm to pixels
+# Note that we use a 2 pixel (one in each side) margin,
+# the Brother driver uses a much wider margin.
+my %WIDTH =
+    (
+     6=>42-2,
+     9=>64-2,
+     12=>84-2,
+     18=>128-2,
+     24=>128,
+     );
+
+my $code = GD::Barcode::QRcode->new($text, { Ecc => 'L', Version => 1 })->plot();
+
+printf "QRBounds(%i,%i)\n", $code->getBounds;
+
+my $resized = GD::Image->new($WIDTH{$tapewidth}, $WIDTH{$tapewidth});
+
+$resized->copyResized($code, 0,0,0,0, $WIDTH{$tapewidth}, $WIDTH{$tapewidth}, ($code->getBounds()));
+
+open my $fh, ">", "code.png";
+binmode $fh;
+print $fh $resized->png;
+close $fh;
+
+#$code->save("code.png", "png");
+
