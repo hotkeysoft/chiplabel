@@ -6,10 +6,10 @@ use GD;
 use GD::Barcode::QRcode;
 use Getopt::Long;
 
-#my $font = "./FreeSans.ttf";
-my $font = "Times:Italic";
-my $text = "Hello, World!";
-#my $text = "Hello, World! This is a test of the emergency broadcast system!";
+my $font = "Ariel-10";
+#my $text = "Hello, World!";
+my $text = "\n John Meacham\n  626-379-6981\n  john\@foo.net";
+my $qrtext = "MECARD:N:Meacham,John;TEL:626-379-6981;EMAIL:john\@foo.net;;";
 
 # tape width in mm
 my $tapewidth = 24;
@@ -28,18 +28,10 @@ my %WIDTH =
 
 my $codeside = $WIDTH{$tapewidth};
 
-my $code = GD::Barcode::QRcode->new($text, { Ecc => 'L', Version => 1 })->plot();
+my $code = GD::Barcode::QRcode->new($qrtext, { Ecc => 'L', Version => 5 })->plot();
 $code->useFontConfig(1);
 
 printf "QRBounds(%i,%i)\n", $code->getBounds;
-
-#my $img = GD::Image->new();
-#my $bg = $img->colorAllocate(255,255,255);
-#my $fg = $img->colorAllocate(0,0,0);
-#my @tbounds = $img->stringFT($fg, $font, 18, 0, 0, 64, $text);
-
-
-#print "Text($tw,$th) ", join " ", @tbounds ," \n";
 
 my $tgd = drawtext($text);
 my ($tw,$th) = $tgd->getBounds();
@@ -64,15 +56,16 @@ close $fh;
 
 sub drawtext {
     my ($text) = @_;
+    my $fsize = 24;
 #    my $timg = GD::Image->new();
     #   $timg->useFontConfig(1);
     #   my @tb = $timg->stringFT($timg->colorAllocate(0,0,0), $font, 24, 0, 0, 0, $text);
-    my @tb = GD::Image->stringFT(0, $font, 24, 0, 0, 0, $text);
+    my @tb = GD::Image->stringFT(0, $font, $fsize, 0, 0, 0, $text);
     my ($tw,$th) = ($tb[2] - $tb[6], $tb[3] - $tb[7]);
     print "Text($tw,$th) ", join " ", @tb ," \n";
     my $img = GD::Image->new($tw,$th);
     my $bg = $img->colorAllocate(255,255,255);
     my $fg = $img->colorAllocate(0,0,0);
-    $img->stringFT(-$fg, $font, 18, 0, -$tb[6], -$tb[7], $text);
+    $img->stringFT(-$fg, $font, $fsize, 0, -$tb[6], -$tb[7], $text);
     return $img;
 }

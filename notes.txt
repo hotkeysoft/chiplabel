@@ -1,2 +1,3 @@
 /dev/bus/usb/005/008
 /usr/share/fonts/truetype/freefont/FreeSans.ttf
+MECARD:N:Meacham,John;TEL:626-379-6981;EMAIL:john@foo.net;;

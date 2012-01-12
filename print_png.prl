@@ -80,8 +80,8 @@ sub initialize {
     my $output=chr(0x1B).'@';
     $output .= chr(0x1B).'iS';
     $output .= chr(0x1B).'iR'.chr(0x01);
-#    my $mode = ($opt->{feed}||0) & 31 | $opt->{cut} ? 64 : 0 | $opt->{mirror} ? 128 : 0;
-#    $output .= chr(0x1B).'iM'.chr($mode);  # Set mode
+    my $mode = ($opt->{feed}||0) & 31 | $opt->{cut} ? 64 : 0 | $opt->{mirror} ? 128 : 0;
+    $output .= chr(0x1B).'iM'.chr($mode);  # Set mode
     return $output;
 }
 
