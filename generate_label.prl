@@ -7,12 +7,13 @@ use GD::Barcode::QRcode;
 use Getopt::Long;
 
 my $font = "Ariel";
-#my $text = "Hello, World!";
+my $fsize = 18;
+my $outfile = "label.png";
 my $text = "\n John Meacham\n  626-379-6981\n  john\@foo.net";
 my $qrtext = "MECARD:N:Meacham,John;TEL:626-379-6981;EMAIL:john\@foo.net;;";
 
 # tape width in mm
-my $tapewidth = 24;
+my $tapewidth = 12;
 
 # This maps the tape width from mm to pixels
 # Note that we use a 2 pixel (one in each side) margin,
@@ -28,7 +29,7 @@ my %WIDTH =
 
 my $codeside = $WIDTH{$tapewidth};
 
-my $code = GD::Barcode::QRcode->new($qrtext, { Ecc => 'L', Version => 5 })->plot();
+my $code = createcode($qrtext);
 $code->useFontConfig(1);
 
 printf "QRBounds(%i,%i)\n", $code->getBounds;
@@ -43,23 +44,13 @@ my $fg = $img->colorAllocate(0,0,0);
 $img->copy($tgd,0,0,0,0, ($tgd->getBounds()));
 $img->copyResized($code,$tw,0,0,0, $codeside, $codeside, ($code->getBounds()));
 
-#my $resized = GD::Image->new($WIDTH{$tapewidth}, $WIDTH{$tapewidth});
-
-#$resized->copyResized($code, 0,0,0,0, $WIDTH{$tapewidth}, $WIDTH{$tapewidth}, ($code->getBounds()));
-
-open my $fh, ">", "code.png";
+open my $fh, ">", $outfile;
 binmode $fh;
 print $fh $img->png;
 close $fh;
 
-#$code->save("code.png", "png");
-
 sub drawtext {
     my ($text) = @_;
-    my $fsize = 24;
-#    my $timg = GD::Image->new();
-    #   $timg->useFontConfig(1);
-    #   my @tb = $timg->stringFT($timg->colorAllocate(0,0,0), $font, 24, 0, 0, 0, $text);
     my @tb = GD::Image->stringFT(0, $font, $fsize, 0, 0, 0, $text);
     my ($tw,$th) = ($tb[2] - $tb[6], $tb[3] - $tb[7]);
     print "Text($tw,$th) ", join " ", @tb ," \n";
@@ -68,4 +59,21 @@ sub drawtext {
     my $fg = $img->colorAllocate(0,0,0);
     $img->stringFT(-$fg, $font, $fsize, 0, -$tb[6], -$tb[7], $text);
     return $img;
+}
+
+sub createcode {
+    my ($text) = @_;
+    foreach my $v (1 .. 40) {
+        my $code = eval { GD::Barcode::QRcode->new($text, { Ecc => 'L', Version => $v }) };
+        if (defined $code) {
+            print "QR Version: $v\n";
+            foreach my $q ('H', 'Q', 'M', 'L') {
+                $code = eval { GD::Barcode::QRcode->new($text, { Ecc => $q, Version => $v }) };
+                if (defined $code) {
+                    print "QR Quality: $q\n";
+                    return $code->plot();
+                }
+            }
+        }
+    }
 }
