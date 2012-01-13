@@ -4,17 +4,39 @@ use warnings;
 
 use GD;
 use GD::Barcode::QRcode;
+use GD::Barcode::DataMatrix;
 use Getopt::Long;
+
 
 my $font = "Ariel";
 my $fsize = 18;
 my $outfile = "label.png";
-my $text = "\n John Meacham\n  626-379-6981\n  john\@foo.net";
-my $qrtext = "MECARD:N:Meacham,John;TEL:626-379-6981;EMAIL:john\@foo.net;;";
-#my $qrtext = "foo.net/d/foo.pdf";
+my $text = '';
+my $qrtext = "";
+#$text = "\n John Meacham\n  626-379-6981\n  john\@foo.net";
+#$qrtext = "MECARD:N:Meacham,John;TEL:626-379-6981;EMAIL:john\@foo.net;;";
+
+$text = "\nCaroline Corrigan\n323-806-3097\ncaroline.corrigan\@gmail.com";
+$qrtext = "MECARD:N:Corrigan,Caroline;TEL:323-806-3097;EMAIL:caroline.corrigan\@gmail.com;;";
 
 # tape width in mm
 my $tapewidth = 12;
+my $datamatrix = 0;
+my $minquality = 'L';
+my $chopmargin = 0;
+my $scale = undef;
+
+GetOptions(
+    "w=n" => \$tapewidth,
+    "o=s" => \$outfile,
+    "s=n" => \$scale,
+    "m"   => \$datamatrix,
+    "c=s" => \$qrtext,
+    "q=s" => \$minquality,
+    "t=s" => \$text,
+    "M=n" => \$chopmargin
+    ) or die "invalid options";
+
 
 # This maps the tape width from mm to pixels
 # Note that we use a 2 pixel (one in each side) margin,
@@ -30,8 +52,9 @@ my %WIDTH =
 
 my $codeside = $WIDTH{$tapewidth};
 
-my $code = createcode($qrtext);
+my $code = $datamatrix ? createcode_dm($qrtext) : createcode_qr($qrtext);
 $code->useFontConfig(1);
+my ($cw,$ch) = $code->getBounds();
 
 printf "QRBounds(%i,%i)\n", $code->getBounds;
 
@@ -43,9 +66,10 @@ my $bg = $img->colorAllocate(255,255,255);
 my $fg = $img->colorAllocate(0,0,0);
 
 $img->copy($tgd,0,0,0,0, ($tgd->getBounds()));
-$img->copyResized($code,$tw,0,0,0, $codeside, $codeside, ($code->getBounds()));
+my $cs = defined $scale ? $scale * $cw : $codeside;
+$img->copyResized($code,$tw,0,$chopmargin,$chopmargin, $cs, $cs, map { $_ - $chopmargin * 2 } ($code->getBounds()));
 
-open my $fh, ">", $outfile;
+open my $fh, ">", $outfile or die "$!: $outfile";
 binmode $fh;
 print $fh $img->png;
 close $fh;
@@ -62,10 +86,10 @@ sub drawtext {
     return $img;
 }
 
-sub createcode {
+sub createcode_qr {
     my ($text) = @_;
     foreach my $v (1 .. 40) {
-        my $code = eval { GD::Barcode::QRcode->new($text, { Ecc => 'L', Version => $v }) };
+        my $code = eval { GD::Barcode::QRcode->new($text, { Ecc => $minquality, Version => $v }) };
         if (defined $code) {
             print "QR Version: $v\n";
             foreach my $q ('H', 'Q', 'M', 'L') {
@@ -77,4 +101,10 @@ sub createcode {
             }
         }
     }
+}
+
+sub createcode_dm{
+    my ($text) = @_;
+    my $code = GD::Barcode::DataMatrix->new($text);
+    return $code->plot();
 }

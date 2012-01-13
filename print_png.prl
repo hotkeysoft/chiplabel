@@ -17,9 +17,9 @@ GetOptions(
     "w=n" => \$tapewidth,
     c => \$cut,
     "n=n" => \$count,
-    "o=s" => \$out
+    "o=s" => \$out,
     m => \$mirror
-    );
+    ) or die "invalid options";
 
 # This maps the tape width from mm to pixels
 # Note that we use a 2 pixel (one in each side) margin,
