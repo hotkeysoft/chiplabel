@@ -11,7 +11,7 @@ my $count = 1;
 my $out = undef;
 my $mirror = 0;
 
-my $printername = "Brother_PT-2430PC";
+my $printername = "ptouch";
 GetOptions(
     "P=s" => \$printername,
     "w=n" => \$tapewidth,
@@ -95,7 +95,7 @@ my $rawdata=pprint(map { (GD::Image->newFromPng($_)) x $count } @ARGV);
 if (defined $out) {
 open PRINT, ">", $out or die "$!: $out";
 } else {
-open PRINT, "| lpr -P$printername" or die "$!: | lpr -P$printername";
+open PRINT, "| lpr -l -P$printername" or die "$!: | lpr -P$printername";
 }
 binmode PRINT;
 print PRINT initialize();
