@@ -41,13 +41,6 @@ GetOptions(
     "force" => \$force,
     ) or die "invalid options";
 
-sub writepng ($$) {
-    open my $fh, ">", $_[1] or die "$!: $_[1]";
-    binmode $fh;
-    print $fh $_[0]->png;
-    close $fh;
-}
-
 my $codeside = pixels($tapewidth) || pixels(12);
 my $code = $datamatrix ? createcode_dm($qrtext) : createcode_qr($qrtext, quality => $minquality);
 $code->useFontConfig(1);

@@ -15,6 +15,8 @@ my $fsize = 8;
 sub crop_centered ($@) {
     my ($img,$nw,$nh) = @_;
     my ($ow,$oh) = $img->getBounds();
+    $nw = $ow unless defined $nw;
+    $nh = $oh unless defined $nh;
     my $cw = int(($nw - $ow) / 2);
     my $ch = int(($nh - $oh) / 2);
     my $nimg = GD::Image->new($nw,$nh);
@@ -58,3 +60,28 @@ sub createcode_dm ($) {
     my $code = GD::Barcode::DataMatrix->new($text);
     return $code->plot();
 }
+
+sub vcat (@) {
+    my $opt = ref $_[0] eq 'HASH' ? shift : {};
+    return GD::Image->new(0,0) unless @_;
+    return $_[0] if @_ == 1;
+    my $mw = max { my ($w,$h) = $_->getBounds; return $w;} @_;
+    my $th = sum { my ($w,$h) = $_->getBounds; return $h;} @_;
+    my $img = GD::Image->new($mw,$th);
+    my $cy = 0;
+    while (@_) {
+        my $c = shift;
+        my ($w,$h) = $c->getBounds;
+        $img->copy($c,0,$cy,0,0,$w,$h);
+        $cy += $h;
+    }
+    return $img;
+}
+
+sub writepng ($$) {
+    open my $fh, ">", $_[1] or die "$!: $_[1]";
+    binmode $fh;
+    print $fh $_[0]->png;
+    close $fh;
+}
+
