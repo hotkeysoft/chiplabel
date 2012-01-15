@@ -31,7 +31,7 @@ sub stretch ($@) {
     $nw = $ow unless defined $nw;
     $nh = $oh unless defined $nh;
     my $nimg = GD::Image->new($nw,$nh);
-    $nimg->copyResize($img,0,0,0,0,$nw,$nh,$ow,$oh);
+    $nimg->copyResized($img,0,0,0,0,$nw,$nh,$ow,$oh);
     return $nimg;
 }
 

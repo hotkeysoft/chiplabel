@@ -68,12 +68,8 @@ my ($tw,$th) = $tgd->getBounds();
 
 my $cs = $scale * $cw;
 my $extra = max(0,$scale * (4 - $margin));
-my $img = hcat($tgd, $code); #GD::Image->new($cs + $tw + 2*$extra, $codeside);
-#my $img = GD::Image->new($cs + $tw + 2*$extra, $codeside);
-#$img->copy($tgd,0,0,0,0, ($tgd->getBounds()));
-#my $yoff = int(max((($codeside - $cs) / 2), 0));
-#$img->copyResized($code,$tw + $extra,$yoff,0,0, $cs, $cs, ($code->getBounds()));
-writepng(stretch($img,$cs, $cs), $outfile);
+my $img = hcat($tgd, stretch($code,$cs,$cs));
+writepng(crop_centered($img,undef, $codeside), $outfile);
 
 __END__
 
