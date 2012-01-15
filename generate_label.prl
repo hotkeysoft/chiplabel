@@ -24,8 +24,9 @@ $qrtext = "MECARD:N:Meacham,John;TEL:626-379-6981;EMAIL:john\@foo.net;;";
 my $tapewidth = 12;
 my $datamatrix = 0;
 my $minquality = 'L';
-my $margin = 4;
+my $margin = 2;
 my $scale = undef;
+my $force = 0;
 
 GetOptions(
     "w=n" => \$tapewidth,  # width of tape
@@ -37,6 +38,7 @@ GetOptions(
     "t=s" => \$text,
     "M=n" => \$margin,
     "qrfile=s" => \$qrfile,
+    "force" => \$force,
     ) or die "invalid options";
 
 sub writepng ($$) {
@@ -54,20 +56,28 @@ $code = crop_centered($code,map { $_ + 2*$margin - 8 } ($code->getBounds()));
 printf "modified QRBounds(%i,%i)\n", $code->getBounds();
 writepng($code, $qrfile) if $qrfile;
 
+my ($cw) = $code->getBounds();
+if (!defined $scale) {
+    my $factor = $codeside / $cw;
+    $scale = $factor < 3.5 ? int($factor) : $factor;
+    printf "Scale factor: %.4f -> %.4f\n",$factor, $scale;
+    die "computed scale is too small to create readable code." if $scale < 2 && !$force;
+}
+
 my $tgd = drawtext($text);
 my ($tw,$th) = $tgd->getBounds();
 
-my $img = GD::Image->new($codeside + $tw, $codeside);
+my $cs = $scale * $cw;
+my $extra = max(0,$scale * (4 - $margin));
+my $img = GD::Image->new($cs + $tw + 2*$extra, $codeside);
 my $bg = $img->colorAllocate(255,255,255);
 my $fg = $img->colorAllocate(0,0,0);
 #my $grey = $img->colorAllocate(30,30,30);
 #$img->fill(0,0,$grey);
 
 $img->copy($tgd,0,0,0,0, ($tgd->getBounds()));
-my ($cw,$ch) = $code->getBounds();
-my $cs = defined $scale ? $scale * $cw : $codeside;
 my $yoff = int(max((($codeside - $cs) / 2), 0));
-$img->copyResized($code,$tw,$yoff,0,0, $cs, $cs, ($code->getBounds()));
+$img->copyResized($code,$tw + $extra,$yoff,0,0, $cs, $cs, ($code->getBounds()));
 writepng($img, $outfile);
 
 __END__
