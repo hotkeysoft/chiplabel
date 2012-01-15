@@ -1,16 +1,16 @@
 package GdUtil;
 use Exporter 'import';
-@EXPORT_OK = qw/crop_centered drawtext createcode_qr createcode_dm/;
+@EXPORT_OK = qw/crop_centered drawtext createcode_qr createcode_dm writepng hcat vcat stretch/;
 use strict;
 use warnings;
 
 use GD;
 use GD::Barcode::QRcode;
 use GD::Barcode::DataMatrix;
-use List::Util qw/max min/;
+use List::Util qw/sum max min/;
 
 my $font = "Ariel";
-my $fsize = 8;
+my $fsize = 18;
 
 sub crop_centered ($@) {
     my ($img,$nw,$nh) = @_;
@@ -22,6 +22,16 @@ sub crop_centered ($@) {
     my $nimg = GD::Image->new($nw,$nh);
     $nimg->colorAllocate(255,255,255);
     $nimg->copy($img,max(0,$cw),max(0,$ch),-min(0,$cw),-min(0,$ch),$nw,$nh);
+    return $nimg;
+}
+
+sub stretch ($@) {
+    my ($img,$nw,$nh) = @_;
+    my ($ow,$oh) = $img->getBounds();
+    $nw = $ow unless defined $nw;
+    $nh = $oh unless defined $nh;
+    my $nimg = GD::Image->new($nw,$nh);
+    $nimg->copyResize($img,0,0,0,0,$nw,$nh,$ow,$oh);
     return $nimg;
 }
 
@@ -61,19 +71,42 @@ sub createcode_dm ($) {
     return $code->plot();
 }
 
-sub vcat (@) {
-    my $opt = ref $_[0] eq 'HASH' ? shift : {};
+sub vcat  {
+    #my $opt = ref $_[0] eq 'HASH' ? shift : {};
+    my @is = @_;
     return GD::Image->new(0,0) unless @_;
     return $_[0] if @_ == 1;
-    my $mw = max { my ($w,$h) = $_->getBounds; return $w;} @_;
-    my $th = sum { my ($w,$h) = $_->getBounds; return $h;} @_;
+    my ($w,$h);
+    my $mw = max(map { ($w,$h) = $_->getBounds(); $w; } @is);
+    my $th = sum(map { ($w,$h) = $_->getBounds(); $h; } @is);
+
     my $img = GD::Image->new($mw,$th);
     my $cy = 0;
-    while (@_) {
-        my $c = shift;
+    while (@is) {
+        my $c = shift(@is);
         my ($w,$h) = $c->getBounds;
-        $img->copy($c,0,$cy,0,0,$w,$h);
+        $img->copy($c,($mw - $w) / 2,$cy,0,0,$w,$h);
         $cy += $h;
+    }
+    return $img;
+}
+
+sub hcat  {
+    #my $opt = ref $_[0] eq 'HASH' ? shift : {};
+    my @is = @_;
+    return GD::Image->new(0,0) unless @_;
+    return $_[0] if @_ == 1;
+    my ($w,$h);
+    my $tw = sum(map { ($w,$h) = $_->getBounds(); $w; } @is);
+    my $mh = max(map { ($w,$h) = $_->getBounds(); $h; } @is);
+
+    my $img = GD::Image->new($tw,$mh);
+    my $cx = 0;
+    while (@is) {
+        my $c = shift(@is);
+        my ($w,$h) = $c->getBounds;
+        $img->copy($c, $cx, ($mh - $h) / 2,0,0,$w,$h);
+        $cx += $w;
     }
     return $img;
 }
@@ -84,4 +117,3 @@ sub writepng ($$) {
     print $fh $_[0]->png;
     close $fh;
 }
-
