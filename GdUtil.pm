@@ -1,7 +1,7 @@
 package GdUtil;
 use Exporter 'import';
 @EXPORT_OK = qw/crop_centered drawtext createcode_qr createcode_dm writepng hcat vcat stretch hspace vspace/;
-%EXPORT_TAGS = ( all => [@EXPORT_OK] );
+%EXPORT_TAGS = ( all => \@EXPORT_OK );
 use strict;
 use warnings;
 
