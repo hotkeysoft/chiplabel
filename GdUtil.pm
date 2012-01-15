@@ -1,6 +1,7 @@
 package GdUtil;
 use Exporter 'import';
-@EXPORT_OK = qw/crop_centered drawtext createcode_qr createcode_dm writepng hcat vcat stretch/;
+@EXPORT_OK = qw/crop_centered drawtext createcode_qr createcode_dm writepng hcat vcat stretch hspace vspace/;
+%EXPORT_TAGS = ( all => [@EXPORT_OK] );
 use strict;
 use warnings;
 
@@ -8,9 +9,6 @@ use GD;
 use GD::Barcode::QRcode;
 use GD::Barcode::DataMatrix;
 use List::Util qw/sum max min/;
-
-my $font = "Ariel";
-my $fsize = 18;
 
 sub crop_centered ($@) {
     my ($img,$nw,$nh) = @_;
@@ -31,19 +29,22 @@ sub stretch ($@) {
     $nw = $ow unless defined $nw;
     $nh = $oh unless defined $nh;
     my $nimg = GD::Image->new($nw,$nh);
+    $nimg->colorAllocate(255,255,255);
     $nimg->copyResized($img,0,0,0,0,$nw,$nh,$ow,$oh);
     return $nimg;
 }
 
-sub drawtext ($) {
-    my ($text) = @_;
-    my @tb = GD::Image->stringFT(0, $font, $fsize, 0, 0, 0, $text);
+sub drawtext ($%) {
+    my ($text,%o) = @_;
+    $o{font} ||= "Ariel";
+    $o{size} ||= 18;
+    my @tb = GD::Image->stringFT(0, $o{font}, $o{size}, 0, 0, 0, $text);
     my ($tw,$th) = ($tb[2] - $tb[6], $tb[3] - $tb[7]);
     print "Text($tw,$th) ", join " ", @tb ," \n";
     my $img = GD::Image->new($tw,$th);
     my $bg = $img->colorAllocate(255,255,255);
     my $fg = $img->colorAllocate(0,0,0);
-    $img->stringFT(-$fg, $font, $fsize, 0, -$tb[6], -$tb[7], $text);
+    $img->stringFT(-$fg, $o{font}, $o{size}, 0, -$tb[6], -$tb[7], $text);
     return $img;
 }
 
@@ -116,4 +117,15 @@ sub writepng ($$) {
     binmode $fh;
     print $fh $_[0]->png;
     close $fh;
+}
+
+sub hspace ($) {
+    my $r = GD::Image->new($_[0],1);
+    $r->colorAllocate(255,255,255);
+    return $r;
+}
+sub vspace ($) {
+    my $r = GD::Image->new(1, $_[0]);
+    $r->colorAllocate(255,255,255);
+    return $r;
 }

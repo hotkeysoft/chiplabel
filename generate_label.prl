@@ -7,7 +7,7 @@ use Getopt::Long qw/:config auto_help gnu_getopt bundling/;
 use Pod::Usage;
 use List::Util qw/max min/;
 
-use GdUtil qw/crop_centered drawtext createcode_qr createcode_dm writepng hcat vcat stretch/;
+use GdUtil qw/:all/;
 use PTouch qw/pixels/;
 
 my $outfile = "label.png";
@@ -68,12 +68,14 @@ my ($tw,$th) = $tgd->getBounds();
 
 my $cs = $scale * $cw;
 my $extra = max(0,$scale * (4 - $margin));
-my $img = hcat($tgd, stretch($code,$cs,$cs));
+my $img = hcat(hspace($scale*4), $tgd, stretch($code,$cs,$cs));
 writepng(crop_centered($img,undef, $codeside), $outfile);
 
 __END__
 
 =head1 Generate label png for label printer
+
+=head1 SYNOPSIS
 
  sample [options] [file ...]
 
