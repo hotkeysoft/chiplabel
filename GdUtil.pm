@@ -24,8 +24,9 @@ sub crop_centered ($@) {
 }
 
 sub stretch ($@) {
-    my ($img,$nw,$nh) = @_;
+    my $img = shift;
     my ($ow,$oh) = $img->getBounds();
+    my ($nw,$nh) = @_ == 2 ? @_ : ($_[0]*$ow,$_[0]*$oh);
     $nw = $ow unless defined $nw;
     $nh = $oh unless defined $nh;
     my $nimg = GD::Image->new($nw,$nh);

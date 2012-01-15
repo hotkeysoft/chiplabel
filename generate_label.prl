@@ -49,26 +49,27 @@ my $codeside = pixels($tapewidth) || pixels(12);
 my $code = $datamatrix ? createcode_dm($qrtext) : createcode_qr($qrtext, quality => $minquality);
 $code->useFontConfig(1);
 printf "QRBounds(%i,%i)\n", $code->getBounds;
-$code = crop_centered($code,map { $_ + 2*$margin - 8 } ($code->getBounds()));
+my ($cbw,$cbh) = $code->getBounds();
+$code = crop_centered($code,$cbw + 2*max(4,$margin) - 8, $cbh + 2*$margin - 8);
 printf "modified QRBounds(%i,%i)\n", $code->getBounds();
 writepng($code, $qrfile) if $qrfile;
 
-my ($cw) = $code->getBounds();
+my ($cw,$ch) = $code->getBounds();
 if (!defined $scale) {
-    my $factor = $codeside / $cw;
+    my $factor = $codeside / $ch;
     $scale = $factor < 3.5 ? int($factor) : $factor;
     printf "Scale factor: %.4f -> %.4f\n",$factor, $scale;
     die "computed scale is too small to create readable code." if $scale < 2 && !$force;
 }
 
 #my $tgd = drawtext($text);
-my $tgd = vcat(drawtext($name), drawtext($number), drawtext($email));
+my $tgd = vcat(drawtext($name), drawtext($number, font => 'Times:Italic', size => 16), drawtext($email, size => 16));
 print "$tgd\n";
 my ($tw,$th) = $tgd->getBounds();
 
-my $cs = $scale * $cw;
+my $cs = $scale * $ch;
 my $extra = max(0,$scale * (4 - $margin));
-my $img = hcat(hspace($scale*4), $tgd, stretch($code,$cs,$cs));
+my $img = hcat(hspace($scale*4), $tgd, stretch($code,$scale));
 writepng(crop_centered($img,undef, $codeside), $outfile);
 
 __END__
