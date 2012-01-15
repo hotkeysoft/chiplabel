@@ -5,7 +5,9 @@ use warnings;
 use GD;
 use GD::Barcode::QRcode;
 use GD::Barcode::DataMatrix;
-use Getopt::Long qw/:config auto_help/;
+use Getopt::Long qw/:config auto_help gnu_getopt bundling/;
+use Pod::Usage;
+use List::Util qw/max/;
 
 use PTouch qw/pixels/;
 
@@ -13,6 +15,7 @@ use PTouch qw/pixels/;
 my $font = "Ariel";
 my $fsize = 8;
 my $outfile = "label.png";
+my $qrfile = undef;
 my $text = '';
 my $qrtext = "";
 $text = "\n John Meacham\n  626-379-6981\n  john\@foo.net";
@@ -29,24 +32,32 @@ my $chopmargin = 0;
 my $scale = undef;
 
 GetOptions(
-    "w=n" => \$tapewidth,
+    "w=n" => \$tapewidth,  # width of tape
     "o=s" => \$outfile,
     "s=n" => \$scale,
     "m"   => \$datamatrix,
     "c=s" => \$qrtext,
     "q=s" => \$minquality,
     "t=s" => \$text,
-    "M=n" => \$chopmargin
+    "M=n" => \$chopmargin,
+    "qrfile=s" => \$qrfile,
     ) or die "invalid options";
 
+sub writepng ($$) {
+    open my $fh, ">", $_[1] or die "$!: $_[1]";
+    binmode $fh;
+    print $fh $_[0]->png;
+    close $fh;
+}
 
 my $codeside = pixels($tapewidth) || pixels(12);
 
 my $code = $datamatrix ? createcode_dm($qrtext) : createcode_qr($qrtext);
 $code->useFontConfig(1);
-my ($cw,$ch) = $code->getBounds();
-
 printf "QRBounds(%i,%i)\n", $code->getBounds;
+$code = crop($code,$chopmargin,$chopmargin,map { $_ - $chopmargin * 2 } ($code->getBounds()));
+printf "QRBounds(%i,%i)\n", $code->getBounds;
+writepng($code, $qrfile) if $qrfile;
 
 my $tgd = drawtext($text);
 my ($tw,$th) = $tgd->getBounds();
@@ -54,15 +65,17 @@ my ($tw,$th) = $tgd->getBounds();
 my $img = GD::Image->new($codeside + $tw, $codeside);
 my $bg = $img->colorAllocate(255,255,255);
 my $fg = $img->colorAllocate(0,0,0);
+my $grey = $img->colorAllocate(100,100,100);
+$img->fill(0,0,$grey);
 
 $img->copy($tgd,0,0,0,0, ($tgd->getBounds()));
+my ($cw,$ch) = $code->getBounds();
 my $cs = defined $scale ? $scale * $cw : $codeside;
-$img->copyResized($code,$tw,0,$chopmargin,$chopmargin, $cs, $cs, map { $_ - $chopmargin * 2 } ($code->getBounds()));
+my $yoff = int(max((($codeside - $cs) / 2), 0));
+print join ", ", ($code,$tw,$yoff,$chopmargin,$chopmargin, $cs, $cs, map { $_ - $chopmargin * 2 } ($code->getBounds())), "\n";
+$img->copyResized($code,$tw,$yoff,$chopmargin,$chopmargin, $cs, $cs, map { $_ - $chopmargin * 2 } ($code->getBounds()));
 
-open my $fh, ">", $outfile or die "$!: $outfile";
-binmode $fh;
-print $fh $img->png;
-close $fh;
+writepng($img, $outfile);
 
 sub drawtext {
     my ($text) = @_;
@@ -98,3 +111,44 @@ sub createcode_dm{
     my $code = GD::Barcode::DataMatrix->new($text);
     return $code->plot();
 }
+
+sub crop {
+    my ($img,$x,$y,$nw,$nh) = @_;
+    my $nimg = GD::Image->new($nw,$nh);
+    $nimg->copy($img,0,0,$x,$y,$nw,$nh);
+    return $nimg;
+}
+
+
+__END__
+
+=head1 Generate label png for label printer
+
+ sample [options] [file ...]
+
+ Options:
+   -help            brief help message
+   -man             full documentation
+
+=head1 OPTIONS
+
+=over 8
+
+=item B<-help>
+
+Print a brief help message and exits.
+
+=item B<-man>
+
+Prints the manual page and exits.
+
+=back
+
+=head1 DESCRIPTION
+
+B<This program> will read the given input file(s) and do something
+useful with the contents thereof.
+
+
+=cut
+
