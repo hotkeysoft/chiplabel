@@ -5,7 +5,9 @@ use warnings;
 use GD;
 use GD::Barcode::QRcode;
 use GD::Barcode::DataMatrix;
-use Getopt::Long;
+use Getopt::Long qw/:config auto_help/;
+
+use PTouch qw/pixels/;
 
 
 my $font = "Ariel";
@@ -38,19 +40,7 @@ GetOptions(
     ) or die "invalid options";
 
 
-# This maps the tape width from mm to pixels
-# Note that we use a 2 pixel (one in each side) margin,
-# the Brother driver uses a much wider margin.
-my %WIDTH =
-    (
-     6=>42-2,
-     9=>64-2,
-     12=>84-2,
-     18=>128-2,
-     24=>128,
-     );
-
-my $codeside = $WIDTH{$tapewidth};
+my $codeside = pixels($tapewidth) || pixels(12);
 
 my $code = $datamatrix ? createcode_dm($qrtext) : createcode_qr($qrtext);
 $code->useFontConfig(1);

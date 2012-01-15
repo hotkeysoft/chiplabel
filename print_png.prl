@@ -5,6 +5,8 @@ use warnings;
 use GD;
 use Getopt::Long;
 
+use PTouch qw/pixels/;
+
 my $tapewidth = 12;
 my $cut = 0;
 my $count = 1;
@@ -20,18 +22,6 @@ GetOptions(
     "o=s" => \$out,
     m => \$mirror
     ) or die "invalid options";
-
-# This maps the tape width from mm to pixels
-# Note that we use a 2 pixel (one in each side) margin,
-# the Brother driver uses a much wider margin.
-my %WIDTH =
-    (
-     6=>42-2,
-     9=>64-2,
-     12=>84-2,
-     18=>128-2,
-     24=>128,
-     );
 
 my $opt = {cut=>$cut, mirror=>$mirror, feed=>0};
 
@@ -56,7 +46,7 @@ sub pprint {
 		push @bytes, 0;
 	    }
 	    for my $y (0..127) {
-		my $set = $y > 64-$WIDTH{$tapewidth}/2 && $y < 64+$WIDTH{$tapewidth}/2;
+		my $set = $y > 64-pixels($tapewidth)/2 && $y < 64+pixels($tapewidth)/2;
 		$set = 0 unless checkPixel($img, $x, $y - $y0);
 		if ($set) {
 		    my $bit = 2** (7-($y % 8));
