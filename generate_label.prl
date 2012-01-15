@@ -47,13 +47,11 @@ sub writepng ($$) {
 }
 
 my $codeside = pixels($tapewidth) || pixels(12);
-my $chopmargin = 4 - $margin;
-
 my $code = $datamatrix ? createcode_dm($qrtext) : createcode_qr($qrtext, quality => $minquality);
 $code->useFontConfig(1);
 printf "QRBounds(%i,%i)\n", $code->getBounds;
-$code = crop_centered($code,map { $_ - $chopmargin * 2 } ($code->getBounds()));
-printf "modified QRBounds(%i,%i)\n", $code->getBounds if $chopmargin;
+$code = crop_centered($code,map { $_ + 2*$margin - 8 } ($code->getBounds()));
+printf "modified QRBounds(%i,%i)\n", $code->getBounds();
 writepng($code, $qrfile) if $qrfile;
 
 my $tgd = drawtext($text);
