@@ -5,9 +5,9 @@ use warnings;
 use GD;
 use Getopt::Long qw/:config auto_help gnu_getopt bundling/;
 use Pod::Usage;
-use List::Util qw/max/;
+use List::Util qw/max min/;
 
-use GdUtil qw/crop drawtext createcode_qr createcode_dm/;
+use GdUtil qw/crop_centered drawtext createcode_qr createcode_dm/;
 use PTouch qw/pixels/;
 
 my $outfile = "label.png";
@@ -24,7 +24,7 @@ $qrtext = "MECARD:N:Meacham,John;TEL:626-379-6981;EMAIL:john\@foo.net;;";
 my $tapewidth = 12;
 my $datamatrix = 0;
 my $minquality = 'L';
-my $chopmargin = 0;
+my $margin = 4;
 my $scale = undef;
 
 GetOptions(
@@ -35,7 +35,7 @@ GetOptions(
     "c=s" => \$qrtext,
     "q=s" => \$minquality,
     "t=s" => \$text,
-    "M=n" => \$chopmargin,
+    "M=n" => \$margin,
     "qrfile=s" => \$qrfile,
     ) or die "invalid options";
 
@@ -47,12 +47,13 @@ sub writepng ($$) {
 }
 
 my $codeside = pixels($tapewidth) || pixels(12);
+my $chopmargin = 4 - $margin;
 
-my $code = $datamatrix ? createcode_dm($qrtext) : createcode_qr($qrtext);
+my $code = $datamatrix ? createcode_dm($qrtext) : createcode_qr($qrtext, quality => $minquality);
 $code->useFontConfig(1);
 printf "QRBounds(%i,%i)\n", $code->getBounds;
-$code = crop($code,$chopmargin,$chopmargin,map { $_ - $chopmargin * 2 } ($code->getBounds()));
-printf "QRBounds(%i,%i)\n", $code->getBounds;
+$code = crop_centered($code,map { $_ - $chopmargin * 2 } ($code->getBounds()));
+printf "modified QRBounds(%i,%i)\n", $code->getBounds if $chopmargin;
 writepng($code, $qrfile) if $qrfile;
 
 my $tgd = drawtext($text);
@@ -69,10 +70,7 @@ my ($cw,$ch) = $code->getBounds();
 my $cs = defined $scale ? $scale * $cw : $codeside;
 my $yoff = int(max((($codeside - $cs) / 2), 0));
 $img->copyResized($code,$tw,$yoff,0,0, $cs, $cs, ($code->getBounds()));
-
 writepng($img, $outfile);
-
-
 
 __END__
 

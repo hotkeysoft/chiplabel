@@ -1,22 +1,25 @@
 package GdUtil;
 use Exporter 'import';
-@EXPORT_OK = qw/crop drawtext createcode_qr createcode_dm/;
+@EXPORT_OK = qw/crop_centered drawtext createcode_qr createcode_dm/;
 use strict;
 use warnings;
 
 use GD;
 use GD::Barcode::QRcode;
 use GD::Barcode::DataMatrix;
+use List::Util qw/max min/;
 
 my $font = "Ariel";
 my $fsize = 8;
-my $minquality = 'L';
 
-sub crop ($@) {
-    my ($img,$x,$y,$nw,$nh) = @_;
+sub crop_centered ($@) {
+    my ($img,$nw,$nh) = @_;
+    my ($ow,$oh) = $img->getBounds();
+    my $cw = int(($nw - $ow) / 2);
+    my $ch = int(($nh - $oh) / 2);
     my $nimg = GD::Image->new($nw,$nh);
     $nimg->colorAllocate(255,255,255);
-    $nimg->copy($img,0,0,$x,$y,$nw,$nh);
+    $nimg->copy($img,max(0,$cw),max(0,$ch),-min(0,$cw),-min(0,$ch),$nw,$nh);
     return $nimg;
 }
 
@@ -32,10 +35,11 @@ sub drawtext ($) {
     return $img;
 }
 
-sub createcode_qr {
-    my ($text) = @_;
+sub createcode_qr ($%) {
+    my ($text, %opt) = @_;
+    $opt{quality} ||= 'L';
     foreach my $v (1 .. 40) {
-        my $code = eval { GD::Barcode::QRcode->new($text, { Ecc => $minquality, Version => $v }) };
+        my $code = eval { GD::Barcode::QRcode->new($text, { Ecc => $opt{quality}, Version => $v }) };
         if (defined $code) {
             print "QR Version: $v\n";
             foreach my $q ('H', 'Q', 'M', 'L') {
@@ -49,7 +53,7 @@ sub createcode_qr {
     }
 }
 
-sub createcode_dm{
+sub createcode_dm ($) {
     my ($text) = @_;
     my $code = GD::Barcode::DataMatrix->new($text);
     return $code->plot();
