@@ -9,8 +9,7 @@ use warnings;
 # Note that we use a 2 pixel (one in each side) margin,
 # the Brother driver uses a much wider margin.
 my %WIDTH = (
-#     6=>42-2,
-     6=>42,
+     6=>42-2,
      9=>64-2,
      12=>84-2,
      18=>128-2,

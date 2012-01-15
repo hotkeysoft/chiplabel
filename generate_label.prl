@@ -65,15 +65,14 @@ my ($tw,$th) = $tgd->getBounds();
 my $img = GD::Image->new($codeside + $tw, $codeside);
 my $bg = $img->colorAllocate(255,255,255);
 my $fg = $img->colorAllocate(0,0,0);
-my $grey = $img->colorAllocate(100,100,100);
-$img->fill(0,0,$grey);
+#my $grey = $img->colorAllocate(30,30,30);
+#$img->fill(0,0,$grey);
 
 $img->copy($tgd,0,0,0,0, ($tgd->getBounds()));
 my ($cw,$ch) = $code->getBounds();
 my $cs = defined $scale ? $scale * $cw : $codeside;
 my $yoff = int(max((($codeside - $cs) / 2), 0));
-print join ", ", ($code,$tw,$yoff,$chopmargin,$chopmargin, $cs, $cs, map { $_ - $chopmargin * 2 } ($code->getBounds())), "\n";
-$img->copyResized($code,$tw,$yoff,$chopmargin,$chopmargin, $cs, $cs, map { $_ - $chopmargin * 2 } ($code->getBounds()));
+$img->copyResized($code,$tw,$yoff,0,0, $cs, $cs, ($code->getBounds()));
 
 writepng($img, $outfile);
 
@@ -115,6 +114,7 @@ sub createcode_dm{
 sub crop {
     my ($img,$x,$y,$nw,$nh) = @_;
     my $nimg = GD::Image->new($nw,$nh);
+    $nimg->colorAllocate(255,255,255);
     $nimg->copy($img,0,0,$x,$y,$nw,$nh);
     return $nimg;
 }
