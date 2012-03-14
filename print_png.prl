@@ -7,13 +7,12 @@ use Getopt::Long;
 
 use PTouch qw/pixels/;
 
-my $tapewidth = 12;
+my ($out,$tapewidth);
 my $cut = 0;
 my $count = 1;
-my $out = undef;
 my $mirror = 0;
-
 my $printername = "ptouch";
+
 GetOptions(
     "P=s" => \$printername,
     "w=n" => \$tapewidth,
@@ -23,7 +22,7 @@ GetOptions(
     m => \$mirror
     ) or die "invalid options";
 
-my $opt = {cut=>$cut, mirror=>$mirror, feed=>0};
+defined $tapewidth or die "You must specify a width with -w";
 
 # returns true if pixel is black, zero if it is white or undef if out of bounds.
 sub checkPixel {
