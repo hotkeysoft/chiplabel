@@ -1,0 +1,72 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+
+use GD;
+use Getopt::Long qw/:config auto_help gnu_getopt bundling/;
+use Pod::Usage;
+use List::Util qw/max min/;
+
+use GdUtil qw/:all/;
+use PTouch qw/pixels PIX_PER_MM/;
+
+my $outfile = "label.png";
+
+my @pins = qw(GND TRG OUT /RST CTRL THR DIS Vcc);
+my $name = "NE555";
+
+# tape width in mm
+my $tapewidth = 6;
+my $pin_spacing = 2.54; # mm
+my $offset = 1.0; # mm
+my $force = 0;
+
+GetOptions(
+    "w=n" => \$tapewidth,  # width of tape
+    "o=s" => \$outfile,
+    "force" => \$force,
+    ) or die "invalid options";
+
+my $height = pixels($tapewidth);
+
+my $canvas = GD::Image->new(PIX_PER_MM*($offset*2 + $pin_spacing * (@pins/2 - 1)), $height);
+$canvas->useFontConfig(1);
+my $bg = $canvas->colorAllocate(255,255,255);
+my $fg = $canvas->colorAllocate(0,0,0);
+
+# pin 0
+$canvas->filledRectangle(0,$height / 2 - 3, 2, $height / 2 + 3,$fg);
+$canvas->filledEllipse(2,$height / 2,7,7,$fg);
+
+my $nc = drawtext2($name, font => GD::Font->Tiny);
+my ($tw,$th) = $nc->getBounds();
+$canvas->copy($nc,11,($height - $th) / 2,0,0,$tw,$th);
+
+my $cx = $offset * PIX_PER_MM;
+for my $pl (1 .. @pins / 2) {
+    my $pr = @pins - $pl + 1;
+
+    sub dpin {
+        my ($pn,$lr) = @_;
+        my $bar = $pn =~ s/^\///;
+        my $t = drawtext2($pn, font => GD::Font->Tiny, overbar => $bar );
+        $t = $t->copyRotate270();
+        my ($tw,$th) = $t->getBounds();
+        $canvas->copy($t,$cx - $tw / 2 ,$lr ? ($height - $th) : 0,0,0,$tw,$th);
+    }
+
+    dpin $pins[$pl - 1],1;
+    dpin $pins[$pr - 1],0;
+
+    $cx += $pin_spacing * PIX_PER_MM;
+}
+
+writepng($canvas , $outfile);
+
+__END__
+
+=head1 SYNOPSIS
+
+ Options:
+   --help            brief help message
+   -w n              specify tape width in mm

@@ -1,6 +1,6 @@
 package PTouch;
 use Exporter 'import';
-@EXPORT_OK = qw/pixels/;
+@EXPORT_OK = qw/pixels PIX_PER_MM/;
 use strict;
 use warnings;
 
@@ -15,6 +15,8 @@ my %WIDTH = (
      18=>128-2,
      24=>128,
      );
+
+use constant PIX_PER_MM => 7.0;
 
 sub pixels {
     return undef unless defined $_[0];

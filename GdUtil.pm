@@ -1,13 +1,13 @@
 package GdUtil;
 use Exporter 'import';
-@EXPORT_OK = qw/crop_centered drawtext createcode_qr createcode_dm writepng hcat vcat stretch hspace vspace/;
+@EXPORT_OK = qw/crop_centered drawtext createcode_qr createcode_dm writepng hcat vcat stretch hspace vspace drawtext2/;
 %EXPORT_TAGS = ( all => \@EXPORT_OK );
 use strict;
 use warnings;
 
 use GD;
 use GD::Barcode::QRcode;
-use GD::Barcode::DataMatrix;
+#use GD::Barcode::DataMatrix;
 use List::Util qw/sum max min/;
 
 sub crop_centered ($@) {
@@ -39,13 +39,32 @@ sub drawtext ($%) {
     my ($text,%o) = @_;
     $o{font} ||= "Ariel";
     $o{size} ||= 18;
-    my @tb = GD::Image->stringFT(0, $o{font}, $o{size}, 0, 0, 0, $text);
+    $o{angle} ||= 0;
+    my @tb = GD::Image->stringFT(0, $o{font}, $o{size}, $o{angle}, 0, 0, $text);
     my ($tw,$th) = ($tb[2] - $tb[6], $tb[3] - $tb[7]);
     print "Text($tw,$th) ", join " ", @tb ," \n";
     my $img = GD::Image->new($tw,$th);
     my $bg = $img->colorAllocate(255,255,255);
+    $img->transparent($bg);
     my $fg = $img->colorAllocate(0,0,0);
-    $img->stringFT(-$fg, $o{font}, $o{size}, 0, -$tb[6], -$tb[7], $text);
+    $img->stringFT(-$fg, $o{font}, $o{size}, $o{angle}, -$tb[6], -$tb[7], $text);
+    return $img;
+}
+
+sub drawtext2 ($%) {
+    my ($text,%o) = @_;
+    my $font = $o{font} || GD::Font->Small;
+    $o{angle} ||= 0;
+    $o{overbar} ||= 0;
+    my $ooff = $o{overbar} ? 2 : 0;
+    my ($tw,$th) = ($font->width * length $text, $font->height + $ooff);
+    print "Text2($text,$tw,$th)\n";
+    my $img = GD::Image->new($tw,$th);
+    my $bg = $img->colorAllocate(255,255,255);
+    $img->transparent($bg);
+    my $fg = $img->colorAllocate(0,0,0);
+    $img->string($font, 0,$ooff, $text, $fg);
+    $img->line(0,0,$tw,0,$fg) if $o{overbar};
     return $img;
 }
 
@@ -68,9 +87,9 @@ sub createcode_qr ($%) {
 }
 
 sub createcode_dm ($) {
-    my ($text) = @_;
-    my $code = GD::Barcode::DataMatrix->new($text);
-    return $code->plot();
+#    my ($text) = @_;
+#    my $code = GD::Barcode::DataMatrix->new($text);
+#    return $code->plot();
 }
 
 sub vcat  {
