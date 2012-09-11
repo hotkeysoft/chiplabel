@@ -3,7 +3,7 @@ use strict;
 use warnings;
 
 use GD;
-use Getopt::Long;
+use Getopt::Long qw/:config auto_help gnu_getopt bundling/;
 
 use PTouch qw/pixels/;
 
@@ -82,11 +82,24 @@ sub initialize {
 
 my $rawdata=pprint(map { (GD::Image->newFromPng($_)) x $count } @ARGV);
 if (defined $out) {
-open PRINT, ">", $out or die "$!: $out";
+    open PRINT, ">", $out or die "$!: $out";
 } else {
-open PRINT, "| lpr -l -P$printername" or die "$!: | lpr -P$printername";
+    open PRINT, "| lpr -l -P$printername" or die "$!: | lpr -P$printername";
 }
 binmode PRINT;
 print PRINT initialize();
 print PRINT $rawdata;
 close PRINT;
+
+__END__
+
+=head1 SYNOPSIS
+
+ Options:
+   --help            brief help message
+   -P printer        select printer
+   -w n              specify tape width in mm
+   -c                cut tape between items printed
+   -n count          print count copies of
+   -o outfile        output to file instead of printer
+   -m                mirror the output
