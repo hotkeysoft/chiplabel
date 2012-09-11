@@ -64,7 +64,7 @@ if (!defined $scale) {
 
 #my $tgd = drawtext($text);
 my $tgd = vcat(drawtext($name), drawtext($number, font => 'Times:Italic', size => 16), drawtext($email, size => 16));
-print "$tgd\n";
+#print "$tgd\n";
 my ($tw,$th) = $tgd->getBounds();
 
 my $cs = $scale * $ch;
