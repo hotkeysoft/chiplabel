@@ -45,7 +45,8 @@ GetOptions(
     "force" => \$force,
     ) or die "invalid options";
 
-my $codeside = pixels($tapewidth) || pixels(12);
+hspace(1)->useFontConfig(1);
+my $codeside = pixels($tapewidth) or die "invalid tapewidth: $tapewidth";
 my $code = $datamatrix ? createcode_dm($qrtext) : createcode_qr($qrtext, quality => $minquality);
 $code->useFontConfig(1);
 printf "QRBounds(%i,%i)\n", $code->getBounds;
@@ -63,7 +64,8 @@ if (!defined $scale) {
 }
 
 #my $tgd = drawtext($text);
-my $tgd = vcat(drawtext($name), drawtext($number, font => 'Times:Italic', size => 16), drawtext($email, size => 16));
+#my $tgd = vcat(drawtext($name), drawtext($number, font => 'Times:Italic', size => 16), drawtext($email, size => 16));
+my $tgd = vcat(drawtext($name), drawtext($number), drawtext($email));
 #print "$tgd\n";
 my ($tw,$th) = $tgd->getBounds();
 
@@ -82,5 +84,3 @@ __END__
    -m                use DataMatrix instead of qr code
    -w n              specify tape width in mm
    -M n              number of margin units around code
-
-

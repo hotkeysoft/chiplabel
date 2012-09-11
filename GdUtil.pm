@@ -10,6 +10,16 @@ use GD::Barcode::QRcode;
 #use GD::Barcode::DataMatrix;
 use List::Util qw/sum max min/;
 
+# create an image with the proper foreground and background colors set
+sub new_image {
+    my ($w,$h) = @_;
+    my $img = GD::Image->new($w,$h);
+    my $bg = $img->colorAllocate(255,255,255);
+    $img->transparent($bg);
+    my $fg = $img->colorAllocate(0,0,0);
+    return $img;
+}
+
 sub crop_centered ($@) {
     my ($img,$nw,$nh) = @_;
     my ($ow,$oh) = $img->getBounds();
@@ -17,8 +27,7 @@ sub crop_centered ($@) {
     $nh = $oh unless defined $nh;
     my $cw = int(($nw - $ow) / 2);
     my $ch = int(($nh - $oh) / 2);
-    my $nimg = GD::Image->new($nw,$nh);
-    $nimg->colorAllocate(255,255,255);
+    my $nimg = new_image($nw,$nh);
     $nimg->copy($img,max(0,$cw),max(0,$ch),-min(0,$cw),-min(0,$ch),$nw,$nh);
     return $nimg;
 }
@@ -29,8 +38,7 @@ sub stretch ($@) {
     my ($nw,$nh) = @_ == 2 ? @_ : ($_[0]*$ow,$_[0]*$oh);
     $nw = $ow unless defined $nw;
     $nh = $oh unless defined $nh;
-    my $nimg = GD::Image->new($nw,$nh);
-    $nimg->colorAllocate(255,255,255);
+    my $nimg = new_image($nw,$nh);
     $nimg->copyResized($img,0,0,0,0,$nw,$nh,$ow,$oh);
     return $nimg;
 }
@@ -101,7 +109,7 @@ sub vcat  {
     my $mw = max(map { ($w,$h) = $_->getBounds(); $w; } @is);
     my $th = sum(map { ($w,$h) = $_->getBounds(); $h; } @is);
 
-    my $img = GD::Image->new($mw,$th);
+    my $img = new_image($mw,$th);
     my $cy = 0;
     while (@is) {
         my $c = shift(@is);
@@ -115,13 +123,13 @@ sub vcat  {
 sub hcat  {
     #my $opt = ref $_[0] eq 'HASH' ? shift : {};
     my @is = @_;
-    return GD::Image->new(0,0) unless @_;
+    return new_image(0,0) unless @_;
     return $_[0] if @_ == 1;
     my ($w,$h);
     my $tw = sum(map { ($w,$h) = $_->getBounds(); $w; } @is);
     my $mh = max(map { ($w,$h) = $_->getBounds(); $h; } @is);
 
-    my $img = GD::Image->new($tw,$mh);
+    my $img = new_image($tw,$mh);
     my $cx = 0;
     while (@is) {
         my $c = shift(@is);
@@ -140,12 +148,9 @@ sub writepng ($$) {
 }
 
 sub hspace ($) {
-    my $r = GD::Image->new($_[0],1);
-    $r->colorAllocate(255,255,255);
-    return $r;
+    return new_image($_[0],1);
 }
+
 sub vspace ($) {
-    my $r = GD::Image->new(1, $_[0]);
-    $r->colorAllocate(255,255,255);
-    return $r;
+    return new_image(1, $_[0]);
 }

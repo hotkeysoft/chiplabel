@@ -4,7 +4,6 @@ use Exporter 'import';
 use strict;
 use warnings;
 
-
 # This maps the tape width from mm to pixels
 # Note that we use a 2 pixel (one in each side) margin,
 # the Brother driver uses a much wider margin.
