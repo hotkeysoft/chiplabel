@@ -1,7 +1,7 @@
 package PTouchOut;
 use strict;
 use warnings;
-use fields  qw/width output margin force minquality scale datamatrix/;
+use fields  qw/width output margin force minquality scale datamatrix count/;
 use PTouch;
 use GdUtil qw/:all/;
 use Carp;
@@ -14,6 +14,7 @@ my %default_values = (
     output => "label.png",
     margin => 2,
     minquality => 'L',
+    count => 0
 );
 
 sub new {
@@ -55,10 +56,18 @@ sub pixels {
 }
 
 sub output {
-    my ($self,$canvas) = self(@_);
+    my ($self,$canvas,$fn) = self(@_);
     my ($w,$h) = $canvas->getBounds();
     croak "Final output is too big for tape width: $h > $self->pixels" if $h > $self->pixels;
-    writepng(crop_centered($canvas, undef, $self->pixels), $self->{output});
+    writepng(crop_centered($canvas, undef, $self->pixels), $fn // $self->{output});
+}
+
+sub outputs {
+    my ($self,$canvas,$fn) = self(@_);
+    my $t = $fn // $self->{output};
+    $t =~ s/(.\w*)$//;
+    my $ext = $1 // ".png";
+    $self->output($canvas, sprintf("%s%i%s", $t, $self->{count}++, $ext));
 }
 
 sub code {

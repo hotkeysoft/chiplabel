@@ -3,6 +3,7 @@ use strict;
 use warnings;
 
 use PTouchOut;
+use Text::ASCIITable::Wrap qw/wrap/;
 use GD;
 use Getopt::Long qw/:config auto_help gnu_getopt bundling/;
 use Pod::Usage;
@@ -14,14 +15,20 @@ GetOptions(
     PTouchOut->opts_code,
     ) or die "invalid options";
 
-while(<>) {
-    /^\d+\s+(\w+)\s+(.*?)\s*$/ or next;
-    my ($code,$text) = ($1,$2);
-    $text =~ s/  +/ /g;
-    print "($code) ($text)\n";
-    my $qc = PTouchOut->code("http://www.mcmaster.com/nav/enter.asp?partnum=$code");
-    PTouchOut->outputs(hcat($qc,drawtext($text));
-}
+    while(<>) {
+        /^\d+\s+(\w+)\s+(.*?)\s*$/ or next;
+        my ($code,$text) = ($1,$2);
+        $text =~ s/  +/ /g;
+        print "($code) ($text)\n";
+        my $qc = PTouchOut->code("http://www.mcmaster.com/#$code");
+        for(my $c = 1; $c++; 1) {
+            my $r = wrap($text,$c);
+            if (scalar (split /\n/, $r) <= 3)  {
+                PTouchOut->outputs(hcat($qc,drawtext($r)));
+                last;
+            }
+        }
+    }
 
 #my $height = PTouchOut->pixels;
 
