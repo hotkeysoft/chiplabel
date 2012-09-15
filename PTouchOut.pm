@@ -4,6 +4,8 @@ use warnings;
 use fields  qw/width output margin force minquality scale datamatrix/;
 use PTouch;
 use GdUtil qw/:all/;
+use Carp;
+use List::Util qw/max/;
 use v5.10;
 
 my PTouchOut $gself;
@@ -13,6 +15,14 @@ my %default_values = (
     margin => 2,
     minquality => 'L',
 );
+
+sub new {
+    my $self = shift;
+    $self = fields::new($self) unless ref $self;
+    %$self = %default_values;
+    hspace(1)->useFontConfig(1);
+    return $self;
+}
 
 sub self {
     my $self = shift;
@@ -26,6 +36,7 @@ sub opts {
     return (
     "w=n" => \$self->{width},  # width of tape
     "o=s" => \$self->{output},
+    "force" => \$self->{force},
     );
 }
 
@@ -35,7 +46,6 @@ sub opts_code {
     "M=n" => \$self->{margin},
     "s=f" => \$self->{scale},
     "q=s" => \$self->{minquality},
-    "force" => \$self->{force},
     );
 }
 
@@ -46,15 +56,9 @@ sub pixels {
 
 sub output {
     my ($self,$canvas) = self(@_);
-    writepng($canvas, $self->{output});
-}
-
-sub new {
-    my $self = shift;
-    $self = fields::new($self) unless ref $self;
-    %$self = %default_values;
-    hspace(1)->useFontConfig(1);
-    return $self;
+    my ($w,$h) = $canvas->getBounds();
+    croak "Final output is too big for tape width: $h > $self->pixels" if $h > $self->pixels;
+    writepng(crop_centered($canvas, undef, $self->pixels), $self->{output});
 }
 
 sub code {

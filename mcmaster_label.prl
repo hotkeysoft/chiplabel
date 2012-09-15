@@ -10,18 +10,27 @@ use GdUtil qw/:all/;
 use PTouch qw/pixels PIX_PER_MM/;
 
 GetOptions(
-    PTouchOut->opts
+    PTouchOut->opts,
+    PTouchOut->opts_code,
     ) or die "invalid options";
 
-my $height = PTouchOut->pixels;
+while(<>) {
+    /^\d+\s+(\w+)\s+(.*?)\s*$/ or next;
+    my ($code,$text) = ($1,$2);
+    $text =~ s/  +/ /g;
+    print "($code) ($text)\n";
+    my $qc = PTouchOut->code("http://www.mcmaster.com/nav/enter.asp?partnum=$code");
+    PTouchOut->outputs(hcat($qc,drawtext($text));
+}
 
-my $text = "mcmaster";
+#my $height = PTouchOut->pixels;
 
-my $codeside = $height || die "tapewidth invalid";
-my @lines = split /\s*\r?\n\s*/, $text;
-my $tgd = vcat(map { drawtext($_) } @lines);
+#my $text = "mcmaster";
 
-PTouchOut->output(crop_centered($tgd,undef, $codeside));
+#my @lines = split /\s*\r?\n\s*/, $text;
+#my $tgd = hcat(PTouchOut->code("Pickles!"), vcat(map { drawtext($_) } @lines));
+
+#PTouchOut->output(crop_centered($tgd,undef, $height));
 
 __END__
 
