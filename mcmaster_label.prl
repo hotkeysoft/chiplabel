@@ -17,7 +17,6 @@ my $height = PTouchOut->pixels;
 
 my $text = "mcmaster";
 
-hspace(1)->useFontConfig(1);
 my $codeside = $height || die "tapewidth invalid";
 my @lines = split /\s*\r?\n\s*/, $text;
 my $tgd = vcat(map { drawtext($_) } @lines);
