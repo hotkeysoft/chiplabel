@@ -1,0 +1,34 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+
+use PTouchOut;
+use GD;
+use Getopt::Long qw/:config auto_help gnu_getopt bundling/;
+use Pod::Usage;
+use GdUtil qw/:all/;
+use PTouch qw/pixels PIX_PER_MM/;
+
+GetOptions(
+    PTouchOut->opts
+    ) or die "invalid options";
+
+my $height = PTouchOut->pixels;
+
+my $text = "mcmaster";
+
+hspace(1)->useFontConfig(1);
+my $codeside = $height || die "tapewidth invalid";
+my @lines = split /\s*\r?\n\s*/, $text;
+my $tgd = vcat(map { drawtext($_) } @lines);
+
+PTouchOut->output(crop_centered($tgd,undef, $codeside));
+
+__END__
+
+=head1 SYNOPSIS
+
+ Options:
+   --help            brief help message
+   -w n              specify tape width in mm
+   -o

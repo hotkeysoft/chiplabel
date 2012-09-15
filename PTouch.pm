@@ -21,3 +21,4 @@ sub pixels {
     return undef unless defined $_[0];
     return $WIDTH{$_[0]} or die "Invalid width specified: $_[0]mm";
 }
+
