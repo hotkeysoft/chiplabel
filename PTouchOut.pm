@@ -1,12 +1,13 @@
 package PTouchOut;
 use strict;
 use warnings;
-use fields  qw/width output margin force minquality scale datamatrix count/;
+use v5.10;
+use fields  qw/width output margin force minquality scale datamatrix count fontsize font/;
+
 use PTouch;
 use GdUtil qw/:all/;
 use Carp;
 use List::Util qw/max/;
-use v5.10;
 
 my PTouchOut $gself;
 
@@ -14,7 +15,9 @@ my %default_values = (
     output => "label.png",
     margin => 2,
     minquality => 'L',
-    count => 0
+    count => 0,
+    font => 'Ariel',
+    fontsize => 18
 );
 
 sub new {
@@ -47,6 +50,14 @@ sub opts_code {
     "M=n" => \$self->{margin},
     "s=f" => \$self->{scale},
     "q=s" => \$self->{minquality},
+    );
+}
+
+sub opts_text {
+    my ($self) = self(@_);
+    return (
+    "fn=s" => \$self->{font},
+    "fs=n" => \$self->{fontsize},
     );
 }
 
@@ -86,6 +97,11 @@ sub code {
         die "computed scale is too small to create readable code." if $scale < 2 && !$self->{force};
     }
     return stretch($code,$scale);
+}
+
+sub fontparams {
+    my ($self) = self(@_);
+    return (font => $self->{font}, size => $self->{fontsize});
 }
 
 1;

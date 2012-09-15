@@ -4,6 +4,7 @@ use warnings;
 
 use GD;
 use Getopt::Long qw/:config auto_help gnu_getopt bundling/;
+use Data::Dumper;
 
 use PTouch qw/pixels/;
 
@@ -80,7 +81,8 @@ sub initialize {
     return $output;
 }
 
-my $rawdata=pprint(map { (GD::Image->newFromPng($_)) x $count } @ARGV);
+my @gds = map { GD::Image->newFromPng($_) } @ARGV;
+my $rawdata=pprint((@gds) x $count);
 if (defined $out) {
     open PRINT, ">", $out or die "$!: $out";
 } else {
