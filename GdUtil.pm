@@ -17,7 +17,7 @@ sub new_image {
     my $bg = $img->colorAllocate(255,255,255);
     $img->transparent($bg);
     my $fg = $img->colorAllocate(0,0,0);
-    return $img;
+    return wantarray ? ($img,$fg,$bg) : $img;
 }
 
 sub crop_centered ($@) {
@@ -50,11 +50,8 @@ sub drawtext ($%) {
     $o{angle} ||= 0;
     my @tb = GD::Image->stringFT(0, $o{font}, $o{size}, $o{angle}, 0, 0, $text);
     my ($tw,$th) = ($tb[2] - $tb[6], $tb[3] - $tb[7]);
-    print "Text($tw,$th) ", join " ", @tb ," \n";
-    my $img = GD::Image->new($tw,$th);
-    my $bg = $img->colorAllocate(255,255,255);
-    $img->transparent($bg);
-    my $fg = $img->colorAllocate(0,0,0);
+    #print "Text($tw,$th) ", join " ", @tb ," \n";
+    my ($img,$fg) = new_image($tw,$th);
     $img->stringFT(-$fg, $o{font}, $o{size}, $o{angle}, -$tb[6], -$tb[7], $text);
     return $img;
 }

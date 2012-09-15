@@ -2,35 +2,22 @@
 use strict;
 use warnings;
 
-use GD;
 use Getopt::Long qw/:config auto_help gnu_getopt bundling/;
 use Pod::Usage;
-use List::Util qw/max min/;
-
 use GdUtil qw/:all/;
-use PTouch qw/pixels/;
+use PTouchOut;
 
-my $outfile = "label.png";
 my $text;
 
-my $tapewidth = 6;
-my $margin = 2;
-my $force = 0;
-
 GetOptions(
-    "w=n" => \$tapewidth,  # width of tape
-    "o=s" => \$outfile,
+    PTouchOut->opts,
     "t=s" => \$text,
-    "M=n" => \$margin,
-    "force" => \$force,
     ) or die "invalid options";
 
-hspace(1)->useFontConfig(1);
-my $codeside = pixels($tapewidth) || die "tapewidth invalid";
 my @lines = split /\s*\r?\n\s*/, $text;
 my $tgd = vcat(map { drawtext($_) } @lines);
 
-writepng(crop_centered($tgd,undef, $codeside), $outfile);
+PTouchOut->output($tgd);
 
 __END__
 
