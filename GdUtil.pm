@@ -145,9 +145,9 @@ sub writepng ($$) {
 }
 
 sub hspace ($) {
-    return new_image($_[0],1);
+    return scalar new_image($_[0],1);
 }
 
 sub vspace ($) {
-    return new_image(1, $_[0]);
+    return scalar new_image(1, $_[0]);
 }

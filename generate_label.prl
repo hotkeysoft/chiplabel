@@ -6,6 +6,7 @@ use GD;
 use Getopt::Long qw/:config auto_help gnu_getopt bundling/;
 use Pod::Usage;
 use List::Util qw/max min/;
+use Data::Dumper;
 
 use GdUtil qw/:all/;
 use PTouch qw/pixels/;
@@ -14,12 +15,16 @@ my $outfile = "label.png";
 my $qrfile = undef;
 my $text = '';
 my $qrtext = "";
-$text = "\n John Meacham\n  626-379-6981\n  john\@foo.net";
-$qrtext = "MECARD:N:Meacham,John;TEL:626-379-6981;EMAIL:john\@foo.net;;";
+#$qrtext = "MECARD:N:Meacham,John;TEL:626-379-6981;EMAIL:john\@foo.net;;";
 
-my $name = "John Meacham";
-my $number = "626-379-6981";
-my $email = "john\@foo.net";
+#my $name = "John Meacham";
+#my $number = "626-379-6981";
+#my $email = "john\@foo.net";
+
+my $name = "Kaley Schiltz";
+my $number = "626-226-8498";
+my $email = "ekaley\@gmail.com";
+$qrtext = "MECARD:N:Schiltz,Kaley;TEL:$number;EMAIL:$email;;";
 
 #$text = "\nCaroline Corrigan\n323-806-3097\ncaroline.corrigan\@gmail.com";
 #$qrtext = "MECARD:N:Corrigan,Caroline;TEL:323-806-3097;EMAIL:caroline.corrigan\@gmail.com;;";
@@ -64,6 +69,7 @@ if (!defined $scale) {
 }
 
 #my $tgd = drawtext($text);
+print Dumper(drawtext($name), vspace(1), drawtext($number, font => 'Times:Italic', size => 16), vspace(1), drawtext($email, size => 16));
 my $tgd = vcat(drawtext($name), vspace(1), drawtext($number, font => 'Times:Italic', size => 16), vspace(1), drawtext($email, size => 16));
 #print "$tgd\n";
 my ($tw,$th) = $tgd->getBounds();
