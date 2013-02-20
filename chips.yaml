@@ -1,6 +1,7 @@
 555:
     pins: [ GND,  TRG, OUT, /RST,  CTRL, THR,  DIS,  Vcc ]
 atmega88:
+    status: disable
     pins:
       - RST
       - D0/Rx
@@ -18,8 +19,146 @@ LF356:
       - In-
       - In+
       - V-
-      - NC
-      - V+
-      - OUT
       - BAL
-
+      - OUT
+      - V+
+      - NC
+lm239n:
+    pins:
+      - O2
+      - O1
+      - Vcc
+      - I1-
+      - I1+
+      - I2-
+      - I2+
+      - I3-
+      - I3+
+      - I4-
+      - I4+
+      - GND
+      - O4
+      - O3
+74hc595:
+    pins:
+      - Q1
+      - Q2
+      - Q3
+      - Q4
+      - Q5
+      - Q6
+      - Q7
+      - GND
+      - Q7S
+      - /MR
+      - SHCP
+      - STCP
+      - /OE
+      - DS
+      - Q0
+      - Vcc
+7404:
+  pins:
+    - 1A
+    - 1Y
+    - 2A
+    - 2Y
+    - 3A
+    - 3Y
+    - GND
+    - 4A
+    - 4Y
+    - 5A
+    - 5Y
+    - 6A
+    - 6Y
+    - Vcc
+uln2803a:
+    pins:
+        - 1B
+        - 2B
+        - 3B
+        - 4B
+        - 5B
+        - 6B
+        - 7B
+        - 8B
+        - GND
+        - COM
+        - 8C
+        - 7C
+        - 6C
+        - 5C
+        - 4C
+        - 3C
+        - 2C
+        - 1C
+7405:
+    pins:
+            - 1A
+            - 1Y
+            - 2A
+            - 2Y
+            - 3A
+            - 3Y
+            - GND
+            - 4A
+            - 4Y
+            - 5A
+            - 5Y
+            - 6A
+            - 6Y
+            - Vcc
+mc14001B:
+    name: mc14001b - NOR
+    pins:
+            - 1A
+            - 2A
+            - OA
+            - OB
+            - 1B
+            - 2B
+            - GND
+            - 1C
+            - 2C
+            - OC
+            - OD
+            - 1D
+            - 2D
+            - Vcc
+mc14011B:
+    name: mc14001b - NAND
+    pins:
+            - 1A
+            - 2A
+            - OA
+            - OB
+            - 1B
+            - 2B
+            - GND
+            - 1C
+            - 2C
+            - OC
+            - OD
+            - 1D
+            - 2D
+            - Vcc
+74hc165:
+    name: 74hc165 - PISO register
+    pins:
+      - /PL
+      - CP
+      - D4
+      - D5
+      - D6
+      - D7
+      - /Q7
+      - GND
+      - Q7
+      - DS
+      - D0
+      - D1
+      - D2
+      - D3
+      - /CE
+      - Vcc
