@@ -40,6 +40,7 @@ sub pprint {
 	my $img = shift @_;
 	my ($w,$h) = $img->getBounds();
 	my $y0 = 64 - $h/2;
+        $out .= 'ZZZZ';
 	for my $x (0..$w-1) {
 	    my @bytes;
 	    for my $x (0..15) {

@@ -1,0 +1,25 @@
+555:
+    pins: [ GND,  TRG, OUT, /RST,  CTRL, THR,  DIS,  Vcc ]
+atmega88:
+    pins:
+      - RST
+      - D0/Rx
+      - D1/Tx
+      - D2/I0
+      - D3/I1
+      - D4
+      - Vcc
+      - GND
+      - B6/XT1
+      - B7/XT2
+LF356:
+    pins:
+      - BAL
+      - In-
+      - In+
+      - V-
+      - NC
+      - V+
+      - OUT
+      - BAL
+
