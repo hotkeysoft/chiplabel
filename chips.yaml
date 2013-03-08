@@ -195,3 +195,64 @@ tpic6b595:
         - SOUT
         - GND
         - NC
+lm741:
+    pins:
+      - BAL
+      - In-
+      - In+
+      - V-
+      - BAL
+      - OUT
+      - V+
+      - NC
+cd4053:
+    pins:
+        - B1
+        - B0
+        - C1
+        - Cn
+        - C0
+        - /E
+        - Vee
+        - GND
+        - SC
+        - SB
+        - SA
+        - A0
+        - A1
+        - An
+        - Bn
+        - Vcc
+cd4051:
+    pins:
+        - A4
+        - A6
+        - A
+        - A7
+        - A5
+        - /E
+        - Vee
+        - GND
+        - S2
+        - S1
+        - S0
+        - A3
+        - A0
+        - A1
+        - A2
+        - Vcc
+attiny44:
+        - Vcc
+        - B0
+        - B1
+        - /RST
+        - B2
+        - A7
+        - A6
+        - A5
+        - A4
+        - A3
+        - A2
+        - A1
+        - A0
+        - GND

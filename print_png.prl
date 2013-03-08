@@ -12,7 +12,7 @@ my ($out,$tapewidth);
 my $cut = 0;
 my $count = 1;
 my $mirror = 0;
-my $printername = "Brother-PT-2430PC";
+my $printername = "ptouch";
 
 GetOptions(
     "P=s" => \$printername,
