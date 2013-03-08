@@ -63,7 +63,7 @@ sub drawtext2 ($%) {
     $o{overbar} ||= 0;
     my $ooff = $o{overbar} ? 2 : 0;
     my ($tw,$th) = ($font->width * length $text, $font->height + $ooff);
-    print "Text2($text,$tw,$th)\n";
+#    print "Text2($text,$tw,$th)\n";
     my $img = GD::Image->new($tw,$th);
     my $bg = $img->colorAllocate(255,255,255);
     $img->transparent($bg);

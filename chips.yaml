@@ -127,7 +127,7 @@ mc14001B:
             - 2D
             - Vcc
 mc14011B:
-    name: mc14001b - NAND
+    name: mc14011b - NAND
     pins:
             - 1A
             - 2A
@@ -162,3 +162,36 @@ mc14011B:
       - D3
       - /CE
       - Vcc
+attiny13:
+    pins:
+      - 5RT
+      - 3A3
+      - 4A2
+      - GND
+      - 0MO
+      - 1MI
+      - 2CK
+      - Vcc
+
+tpic6b595:
+    pins:
+        - NC
+        - Vcc
+        - SIN
+        - D0
+        - D1
+        - D2
+        - D3
+        - /SCLR
+        - /G
+        - GND
+        - GND
+        - RCK
+        - SCK
+        - D4
+        - D5
+        - D6
+        - D7
+        - SOUT
+        - GND
+        - NC
