@@ -7,6 +7,7 @@ use Getopt::Long qw/:config auto_help gnu_getopt bundling/;
 use Pod::Usage;
 use List::Util qw/max min/;
 use Data::Dumper;
+use feature qw(switch);
 
 use GdUtil qw/:all/;
 use PTouch qw/pixels PIX_PER_MM/;
@@ -21,6 +22,7 @@ my $offset = 1.0; # mm
 my $force = 0;
 my $all = 0;
 my $chip;
+my $tech;
 
 GetOptions(
     "w=n" => \$tapewidth,  # width of tape
@@ -28,6 +30,7 @@ GetOptions(
     "force" => \$force,
     "c=s" => \$chip,
     "a" => \$all,
+    "t" => \$tech,
     ) or die "invalid options";
 
 my $yaml = YAML::LoadFile("chips.yaml") or die "couldn't read chips.yaml";
@@ -35,10 +38,34 @@ my $height = pixels($tapewidth);
 
 sub genchip {
     my ($ch) = @_;
-
-    my @pins = @{$yaml->{$ch}{pins}};
-    my $name = $yaml->{$ch}{name} || $ch;
-    return if defined $yaml->{$ch}{status} && 
+    my @pins;
+    my $name = $ch;
+    if (!exists $yaml->{$ch}) {
+        # attempt to generate appropriate one.
+        if ($ch =~ /^[57]4[a-z]{1,3}(.*)$/) {
+            my $p = $1;
+#            printf "$ch $p $1\n";
+            if ($p =~ /^4[0-9]{3}$/) {
+                if (exists $yaml->{"CD$p"}) {
+                    $ch = "CD$p";
+                    @pins = @{$yaml->{$ch}{pins}};
+                    map { s/^Vss$/GND/ } @pins;
+                    map { s/^Vdd$/Vcc/ } @pins;
+                }
+            } else {
+                if (exists $yaml->{"74$p"}) {
+                    $ch = "74$p";
+                    @pins = @{$yaml->{$ch}{pins}};
+                }
+            }
+        }
+    } else {
+        @pins = @{$yaml->{$ch}{pins}};
+        $name = $ch;
+    }
+    $name = "$name $yaml->{$ch}{name}" if exists $yaml->{$ch}{name};
+    @pins or die "no pins!";
+    return if defined $yaml->{$ch}{status} &&
         $yaml->{$ch}{status} eq 'disable';
 
     my $canvas = GD::Image->new(PIX_PER_MM*($offset*2 + $pin_spacing * (@pins/2 - 1)), $height);
@@ -73,7 +100,7 @@ sub genchip {
         $cx += $pin_spacing * PIX_PER_MM;
     }
 
-    writepng($canvas , lc "out/$ch.png");
+    writepng($canvas , lc "out/$name.png");
 }
 
 genchip($chip) if $chip;
@@ -88,3 +115,8 @@ __END__
  Options:
    --help            brief help message
    -w n              specify tape width in mm
+   -c chip           chip name as specified in chips.yaml
+   -a                generate pngs for all chips in the file
+   -t (hc,ttl,ac,cd) technology of 74 or 4000 series logic
+
+output placed in out/ directory.

@@ -13,7 +13,7 @@ atmega88:
       - GND
       - B6/XT1
       - B7/XT2
-LF356:
+_op1: &op1
     pins:
       - BAL
       - In-
@@ -23,6 +23,17 @@ LF356:
       - OUT
       - V+
       - NC
+_op2ss: &op2ss
+    pins:
+      - 1Out
+      - 1In-
+      - 1In+
+      - GND
+      - 2In+
+      - 2In-
+      - 2OUT
+      - Vcc
+LF356: *op1
 lm239n:
     pins:
       - O2
@@ -205,7 +216,22 @@ lm741:
       - OUT
       - V+
       - NC
-cd4053:
+attiny44:
+        - Vcc
+        - B0
+        - B1
+        - /RST
+        - B2
+        - A7
+        - A6
+        - A5
+        - A4
+        - A3
+        - A2
+        - A1
+        - A0
+        - GND
+CD4053:
     pins:
         - B1
         - B0
@@ -223,7 +249,7 @@ cd4053:
         - An
         - Bn
         - Vcc
-cd4051:
+CD4051:
     pins:
         - A4
         - A6
@@ -241,18 +267,39 @@ cd4051:
         - A1
         - A2
         - Vcc
-attiny44:
-        - Vcc
-        - B0
-        - B1
-        - /RST
-        - B2
-        - A7
-        - A6
-        - A5
-        - A4
-        - A3
-        - A2
-        - A1
-        - A0
-        - GND
+CD4040:
+    pins:
+        - Q12
+        - Q16
+        - Q5
+        - Q7
+        - Q4
+        - Q3
+        - Q2
+        - Vss
+        - Q1
+        - CLK
+        - RST
+        - Q9
+        - Q8
+        - Q10
+        - Q11
+        - Vdd
+LM358: *op2ss
+LM386:
+    pins:
+      - GAIN
+      - In-
+      - In+
+      - GND
+      - OUT
+      - Vs
+      - BP
+      - GAIN
+7414:
+        name: Schmitt Inverter
+        pins: [ A1, Y1, A2, Y2, A3, Y3, GND, Y4, A4, Y5, A5, Y6, A6, Vcc]
+tlc5620:
+        name: Quad DAC
+        pins: [ GND, RA, RB, RC, RD, DATA, CLK, LOAD, OD, OC, OB, OA, LDAC, Vdd]
+

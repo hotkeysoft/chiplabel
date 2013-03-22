@@ -7,15 +7,15 @@ use Pod::Usage;
 use GdUtil qw/:all/;
 use PTouchOut;
 
-my $text;
+my @text;
 
 GetOptions(
     PTouchOut->opts,
     PTouchOut->opts_text,
-    "t=s" => \$text,
+    "t=s" => \@text,
     ) or die "invalid options";
 
-my @lines = split /\s*[\r\n]+\s*/, $text;
+my @lines = map { split /\s*[\r\n]+\s*/ } @text;
 my $tgd = vcat(map { drawtext($_, PTouchOut->fontparams) } @lines);
 
 PTouchOut->output($tgd);

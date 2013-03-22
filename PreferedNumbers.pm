@@ -1,13 +1,13 @@
 package PreferedNumbers;
 use Exporter 'import';
-@EXPORT_OK = qw/E6 E12 E24 E48 E96/;
+@EXPORT = qw/E6 E12 E24 E48 E96/;
 
 use strict;
 use warnings;
 
 use constant E6 => (10, 15, 22, 33, 47, 68);
-use constant E12 => sort @e6, (12, 18, 27, 39,  56,  68);
-use constant E24 => sort @e12, (11,  13,  16,  20,  24,  30,  36,  43,  51,  62,  75,  91);
+use constant E12 => sort &E6, (12, 18, 27, 39,  56,  82);
+use constant E24 => sort &E12, (11,  13,  16,  20,  24,  30,  36,  43,  51,  62,  75,  91);
 use constant E48 => (100, 121, 147, 178, 215, 261, 316, 383, 464, 562, 681, 825,
 105, 127, 154, 187, 226, 274, 332, 402, 487, 590, 715, 866,
 110, 133, 162, 196, 237, 287, 348, 422, 511, 619, 750, 909,
