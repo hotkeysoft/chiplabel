@@ -1,0 +1,40 @@
+
+atmega88:
+    status: disable
+    pins:
+      - RST
+      - D0/Rx
+      - D1/Tx
+      - D2/I0
+      - D3/I1
+      - D4
+      - Vcc
+      - GND
+      - B6/XT1
+      - B7/XT2
+attiny13:
+    pins:
+      - 5RT
+      - 3A3
+      - 4A2
+      - GND
+      - 0MO
+      - 1MI
+      - 2CK
+      - Vcc
+attiny44:
+    pins:
+        - Vcc
+        - B0
+        - B1
+        - /RST
+        - B2
+        - A7
+        - A6
+        - A5
+        - A4
+        - A3
+        - A2
+        - A1
+        - A0
+        - GND

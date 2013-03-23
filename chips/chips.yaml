@@ -1,0 +1,50 @@
+555:
+    pins: [ GND,  TRG, OUT, /RST,  CTRL, THR,  DIS,  Vcc ]
+uln2803a:
+    pins:
+        - 1B
+        - 2B
+        - 3B
+        - 4B
+        - 5B
+        - 6B
+        - 7B
+        - 8B
+        - GND
+        - COM
+        - 8C
+        - 7C
+        - 6C
+        - 5C
+        - 4C
+        - 3C
+        - 2C
+        - 1C
+tpic6b595:
+    pins:
+        - NC
+        - Vcc
+        - SIN
+        - D0
+        - D1
+        - D2
+        - D3
+        - /SCLR
+        - /G
+        - GND
+        - GND
+        - RCK
+        - SCK
+        - D4
+        - D5
+        - D6
+        - D7
+        - SOUT
+        - GND
+        - NC
+tlc5620:
+        name: Quad DAC
+        pins: [ GND, RA, RB, RC, RD, DATA, CLK, LOAD, OD, OC, OB, OA, LDAC, Vdd]
+MC34063:
+        name: Boost
+        pins: [ C, E, TCAP, GND, IIn, Vcc, ISns, DC ]

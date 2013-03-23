@@ -1,0 +1,38 @@
+_op1: &op1
+    name: OpAmp
+    pins: [BAL, In-, In+, V-, BAL, OUT, V+, NC]
+_op2ss: &op2ss
+    name: SS OpAmp
+    pins: [1Out,1In-,1In+,GND,2In+,2In-,2OUT,Vcc]
+_op2: &op2
+    name: Dual OpAmp
+    pins: [1Out, 1In-, 1In+, V-, 2In+, 2In-, 2OUT, V+ ]
+LF356: *op1
+lm239n:
+    name: Comparator
+    pins:
+      - O2
+      - O1
+      - Vcc
+      - I1-
+      - I1+
+      - I2-
+      - I2+
+      - I3-
+      - I3+
+      - I4-
+      - I4+
+      - GND
+      - O4
+      - O3
+TS922IN: *op2
+lm741: *op1
+LM358: *op2ss
+LM386:
+    name: Audio Op Amp
+    pins:
+      - GAIN
+      - In-
+      - In+
+      - GND
+      - OUT                                                     
