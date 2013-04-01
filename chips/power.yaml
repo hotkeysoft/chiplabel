@@ -1,0 +1,51 @@
+
+SN754410:
+    name: Quad H-Bridge
+    pins: [12E, 1A, 1Y, GND, GND, 2Y, 2A, Vc2, 34E, 3A, 3Y, GND, GND, 4Y, 4A, Vc1 ]
+
+uln2803a:
+    pins:
+        - 1B
+        - 2B
+        - 3B
+        - 4B
+        - 5B
+        - 6B
+        - 7B
+        - 8B
+        - GND
+        - COM
+        - 8C
+        - 7C
+        - 6C
+        - 5C
+        - 4C
+        - 3C
+        - 2C
+        - 1C
+tpic6b595:
+    name: SIPO Power
+    pins:
+        - NC
+        - Vcc
+        - SI
+        - DR0
+        - DR1
+        - DR2
+        - DR3
+        - /SCLR
+        - /G
+        - GND
+        - GND
+        - RCK
+        - SCK
+        - DR4
+        - DR5
+        - DR6
+        - DR7
+        - SO
+        - GND
+        - NC
+MC34063:
+        name: Boost
+        pins: [ C, E, TCAP, GND, IIn, Vcc, ISns, DC ]

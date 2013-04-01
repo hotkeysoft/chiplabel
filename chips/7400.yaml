@@ -11,3 +11,27 @@
 7414:
         name: Schmitt Inverter
         pins: [ A1, Y1, A2, Y2, A3, Y3, GND, Y4, A4, Y5, A5, Y6, A6, Vcc]
+74540:
+        name: Inv. Buffer
+        pins: [ /OE1, A0, A1, A2, A3, A4, A5, A6, A7, GND, /Y7, /Y6, /Y5, /Y4, /Y3, /Y2, /Y1, /Y0, /OE2, Vcc ]
+74541:
+        name: Buffer
+        pins: [ /OE1, A0, A1, A2, A3, A4, A5, A6, A7, GND, Y7, Y6, Y5, Y4, Y3, Y2, Y1, Y0, /OE2, Vcc ]
+74629:
+        name: Dual VCO
+        pins: [ 2FC, 1FC, 1RG, 1C1, 1C2, /1EN, 1Y, O-, GND, 2Y, /2EN, 2C2, 2C1, 2RG, O+, Vcc ]
+74244:
+        name: Dual Buffer 
+        pins: [ /1OE, 1A0, 2Y0, 1A1, 2Y1, 1A2, 2Y2, 1A3, 2Y3, GND, 2A3, 1Y3, 2A2, 1Y2, 2A1, 1Y1, 2A0, 1Y0, /2OE, Vcc ]
+74157:
+        name: Quad Mplex
+        pins: [ S, 0a, 1a, Za, 0b, 1b, Zb, GND, Zd, 1d, 0d, Zc, 1c, 0c, /E, Vcc]
+74132:
+        name: NAND Schmitt Quad
+        pins: [ A1, A1, Y1, A2, A2, Y2, GND, Y3, A3, A3, Y4, A4, A4, Vcc ]
+74574:
+        name: FlipFlop D Rise
+        pins: [ /OE, D0, D1, D2, D3, D4, D5, D6, D7, GND, CK, Q7, Q6, Q5, Q4, Q3, Q2, Q1, Q0, Vcc]
+
+
+

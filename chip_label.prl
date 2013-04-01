@@ -21,14 +21,14 @@ my $pin_spacing = 2.54; # mm
 my $offset = 1.0; # mm
 my $force = 0;
 my $all = 0;
-my $chip;
+my @chip;
 my $tech;
 
 GetOptions(
     "w=n" => \$tapewidth,  # width of tape
     "o=s" => \$outfile,
     "force" => \$force,
-    "c=s" => \$chip,
+    "c=s" => \@chip,
     "a" => \$all,
     "t" => \$tech,
     ) or die "invalid options";
@@ -40,6 +40,7 @@ sub loadFile {
 }
 loadFile 'chips/4000.yaml';
 loadFile 'chips/7400.yaml';
+loadFile 'chips/power.yaml';
 loadFile 'chips/chips.yaml';
 loadFile 'chips/mcu.yaml';
 loadFile 'chips/opamps.yaml';
@@ -72,7 +73,9 @@ sub genchip {
         @pins = @{$yaml{$ch}{pins}};
         $name = $ch;
     }
-    $name = "$name $yaml{$ch}{name}" if exists $yaml{$ch}{name};
+    my $lname = $name;
+    $lname = "$name $yaml{$ch}{name}" if exists $yaml{$ch}{name};
+    print join " ", $lname, @pins, "\n";
     @pins or die "no pins!";
     return if defined $yaml{$ch}{status} &&
         $yaml{$ch}{status} eq 'disable';
@@ -86,7 +89,7 @@ sub genchip {
     $canvas->filledRectangle(0,$height / 2 - 3, 2, $height / 2 + 3,$fg);
     $canvas->filledEllipse(2,$height / 2,7,7,$fg);
 
-    my $nc = drawtext2($name, font => GD::Font->Tiny);
+    my $nc = drawtext2($lname, font => GD::Font->Tiny);
     my ($tw,$th) = $nc->getBounds();
     $canvas->copy($nc,11,($height - $th) / 2,0,0,$tw,$th);
 
@@ -112,7 +115,7 @@ sub genchip {
     writepng($canvas , lc "out/$name.png");
 }
 
-genchip($chip) if $chip;
+genchip($_) for @chip;
 if ($all) {
     genchip($_) foreach keys %yaml;
 }

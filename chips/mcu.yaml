@@ -22,7 +22,7 @@ attiny13:
       - 1MI
       - 2CK
       - Vcc
-attiny44:
+attiny44a:
     pins:
         - Vcc
         - B0
