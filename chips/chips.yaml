@@ -1,7 +1,12 @@
 555:
     pins: [ GND,  TRG, OUT, /RST,  CTRL, THR,  DIS,  Vcc ]
+
 tlc5620:
         name: Quad DAC
         pins: [ GND, RA, RB, RC, RD, DATA, CLK, LOAD, OD, OC, OB, OA, LDAC, Vdd]
+
 dac0808:
-        pins: [ NC, GND, Vee, I0, A1, A2, A3, A4, A5, A6, A7, A8, Vcc, V+, V-, Cmp] 
+     pins: [ NC, GND, Vee, I0, A1, A2, A3, A4, A5, A6, A7, A8, Vcc, "V+", "V-", Cmp]
+cy7c199-15:
+     name: SRAM
+     pins: [ A5, A6, A7, A8, A9, A10, A11, A12, A13, A14, IO0, IO1, IO2, Vss, IO3, IO4, IO5, IO6, IO7, /CE, A0, /OE, A1, A2, A3, A4, /WE, Vcc ]
