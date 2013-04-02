@@ -1,10 +1,8 @@
 555:
     pins: [ GND,  TRG, OUT, /RST,  CTRL, THR,  DIS,  Vcc ]
-
 tlc5620:
         name: Quad DAC
         pins: [ GND, RA, RB, RC, RD, DATA, CLK, LOAD, OD, OC, OB, OA, LDAC, Vdd]
-
 dac0808:
      pins: [ NC, GND, Vee, I0, A1, A2, A3, A4, A5, A6, A7, A8, Vcc, "V+", "V-", Cmp]
 cy7c199-15:

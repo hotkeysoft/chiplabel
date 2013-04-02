@@ -1,9 +1,8 @@
-
 SN754410:
     name: Quad H-Bridge
     pins: [12E, 1A, 1Y, GND, GND, 2Y, 2A, Vc2, 34E, 3A, 3Y, GND, GND, 4Y, 4A, Vc1 ]
-
 uln2803a:
+    name: darlington
     pins:
         - 1B
         - 2B
@@ -49,3 +48,28 @@ tpic6b595:
 MC34063:
         name: Boost
         pins: [ C, E, TCAP, GND, IIn, Vcc, ISns, DC ]
+mc1413BP:
+    name: darlington
+    pins:
+        - 1B
+        - 2B
+        - 3B
+        - 4B
+        - 5B
+        - 6B
+        - 7B
+        - GND
+        - COM
+        - 7C
+        - 6C
+        - 5C
+        - 4C
+        - 3C
+        - 2C
+        - 1C
+sn76489AN:
+        name: Sound Generator
+        pins: [ D5, D6, D7, RDY, /WE, /OE, OUT, GND, NC, D0, D1, D2, D3, CLK, D4, Vcc ]
+mc3479:
+        name: Stepper
+        pins: [ Vd, L2, L1, GND, GND, Bias, CLK, OIC, Vm, L3, L4, GND, GND, /PhA, /CW, /FUL ]

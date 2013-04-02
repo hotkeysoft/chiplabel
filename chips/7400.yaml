@@ -32,6 +32,3 @@
 74574:
         name: FlipFlop D Rise
         pins: [ /OE, D0, D1, D2, D3, D4, D5, D6, D7, GND, CK, Q7, Q6, Q5, Q4, Q3, Q2, Q1, Q0, Vcc]
-
-
-
