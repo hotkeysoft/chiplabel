@@ -21,7 +21,7 @@
         name: Dual VCO
         pins: [ 2FC, 1FC, 1RG, 1C1, 1C2, /1EN, 1Y, O-, GND, 2Y, /2EN, 2C2, 2C1, 2RG, O+, Vcc ]
 74244:
-        name: Dual Buffer 
+        name: Dual Buffer
         pins: [ /1OE, 1A0, 2Y0, 1A1, 2Y1, 1A2, 2Y2, 1A3, 2Y3, GND, 2A3, 1Y3, 2A2, 1Y2, 2A1, 1Y1, 2A0, 1Y0, /2OE, Vcc ]
 74157:
         name: Quad Mplex

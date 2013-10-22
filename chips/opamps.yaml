@@ -14,13 +14,7 @@ lm741: *op1
 LM358: *op2ss
 LM386:
     name: Audio Op Amp
-    pins:
-      - GAIN
-      - In-
-      - In+
-      - GND
-      - OUT                                                     
-      
+    pins: [GAIN, In-, In+, GND, OUT ]
 lm239n:
     name: Comparator
     pins:
