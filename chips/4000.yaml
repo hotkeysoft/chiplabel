@@ -1,21 +1,23 @@
-CD4001:
+family: 4000
+
+4001:
     name: NOR
     pins: [1A, 2A, OA, OB, 1B, 2B, Vss, 1C, 2C, OC, OD, 1D, 2D, Vdd ]
-CD4011:
+4011:
     name: NAND
     pins: [1A, 2A, OA, OB, 1B, 2B, Vss, 1C, 2C, OC, OD, 1D, 2D, Vdd ]
-CD4040:
+4040:
     name: Counter
     pins: [Q12, Q6, Q5, Q7, Q4, Q3, Q2, Vss, Q1, /CLK, RST, Q9, Q8, Q10, Q11, Vdd ]
-CD4051:
+4051:
     name: Multiplexer
     pins: [A4, A6, A, A7, A5, /E, Vee, GND, S2, S1, S0, A3, A0, A1, A2, Vcc ]
-CD4053:
+4053:
     name: Multiplexer
     pins: [B1, B0, C1, Cn, C0, /E, Vee, GND, SC, SB, SA, A0, A1, An, Bn, Vcc ]
-CD4538:
+4538:
         name: Multivibrator
         pins: [ Vss, xA, /RsA, Aa, /Ba, Qa, /Qa, Vss, /Qb, Qb, /Bb, Ab, /RsB, XB, Vss, Vdd ]
-CD4504:
+4504:
         name: LevelShift
         pins: [ Vcc, Ao, Ai, Bo, Bi, Co, Ci, Vss, Di, Do, Ei, Eo, MOD, Fi, Fo, Vdd ]

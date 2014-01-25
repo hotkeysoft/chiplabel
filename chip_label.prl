@@ -4,6 +4,7 @@ use warnings;
 
 use GD;
 use Getopt::Long qw/:config auto_help gnu_getopt bundling/;
+use File::Slurp;
 use Pod::Usage;
 use List::Util qw/max min/;
 use Data::Dumper;
@@ -36,14 +37,49 @@ GetOptions(
 my %yaml;
 sub loadFile {
     my $yaml = YAML::LoadFile($_[0]) or die "$!: $_[0]";
+    my $family = $yaml->{family};
+    delete $yaml->{family};
+    for (keys %$yaml) {
+        $yaml->{$_}{family} = $family if defined $family;
+        $yaml->{$_}{key} = $_;
+    }
     %yaml = (%yaml, %$yaml);
 }
+sub loadChipDbFile {
+    my $data = read_file($_[0]) or die "$!: $_[0]";
+    my $name = $_[0];
+    $name =~ s/^(.*\/)?(.*)\.yaml$/$2/;
+    $data =~ s/^\.\.\.$//m;
+    my $yaml = YAML::Load($data);
+    my $count = $yaml->{pincount};
+    my @pins = ("N/C") x $count;
+    for my $h (@{$yaml->{pins}}) {
+        $pins[$h->{num} - 1] = $h->{sym};
+    }
+    map { if (/\~/) { s/\~//g; s/^/\// } } @pins;
+    my %n = ($name => { key => $name, name => undef, pins => \@pins, family => $yaml->{family}});
+#    print Dumper(\%n);
+    %yaml = (%yaml, %n);
+}
+
+loadChipDbFile 'chipdb-master/4017.yaml';
+loadChipDbFile 'chipdb-master/4013.yaml';
+loadChipDbFile 'chipdb-master/7474.yaml';
+loadChipDbFile 'chipdb-master/4093.yaml';
 loadFile 'chips/4000.yaml';
 loadFile 'chips/7400.yaml';
 loadFile 'chips/power.yaml';
 loadFile 'chips/chips.yaml';
 loadFile 'chips/mcu.yaml';
 loadFile 'chips/opamps.yaml';
+
+my %family;
+for (values %yaml) {
+    $family{$_->{family}}{$_->{key}} = $_;
+}
+
+print Dumper(\%yaml);
+
 my $height = pixels($tapewidth);
 
 sub genchip {
@@ -52,13 +88,12 @@ sub genchip {
     my $name = $ch;
     if (!exists $yaml{$ch}) {
         # attempt to generate appropriate one.
-        if ($ch =~ /^(([57]4[a-z]{1,3})|MC1)(.*)$/) {
+        if ($ch =~ /^(([57]4[a-zA-Z]{1,3})|MC1|CD)(.*)$/) {
             my $p = $3;
 #            printf "$ch $p $1\n";
             if ($p =~ /^4[0-9]{3}$/) {
-                if (exists $yaml{"CD$p"}) {
-                    $ch = "CD$p";
-                    @pins = @{$yaml{$ch}{pins}};
+                if (exists $family{4000}{$p}) {
+                    @pins = @{$family{4000}{$p}{pins}};
                     map { s/^Vss$/GND/ } @pins unless $ch =~ /^MC/;
                     map { s/^Vdd$/Vcc/ } @pins unless $ch =~ /^MC/;
                 }
@@ -74,7 +109,7 @@ sub genchip {
         $name = $ch;
     }
     my $lname = $name;
-    $lname = "$name $yaml{$ch}{name}" if exists $yaml{$ch}{name};
+    $lname = "$name $yaml{$ch}{name}" if defined $yaml{$ch}{name};
     print join " ", $lname, @pins, "\n";
     @pins or die "no pins!";
     return if defined $yaml{$ch}{status} &&
@@ -89,9 +124,6 @@ sub genchip {
     $canvas->filledRectangle(0,$height / 2 - 3, 2, $height / 2 + 3,$fg);
     $canvas->filledEllipse(2,$height / 2,7,7,$fg);
 
-    my $nc = drawtext2($lname, font => GD::Font->Tiny);
-    my ($tw,$th) = $nc->getBounds();
-    $canvas->copy($nc,11,($height - $th) / 2,0,0,$tw,$th);
 
     my $cx = $offset * PIX_PER_MM;
     for my $pl (1 .. @pins / 2) {
@@ -111,6 +143,10 @@ sub genchip {
 
         $cx += $pin_spacing * PIX_PER_MM;
     }
+
+    my $nc = drawtext2($lname, font => GD::Font->Tiny);
+    my ($tw,$th) = $nc->getBounds();
+    $canvas->copy($nc,11,($height - $th) / 2,0,0,$tw,$th);
 
     writepng($canvas , lc "out/$name.png");
 }
