@@ -73,3 +73,32 @@ sn76489AN:
 mc3479:
         name: Stepper
         pins: [ Vd, L2, L1, GND, GND, Bias, CLK, OIC, Vm, L3, L4, GND, GND, /PhA, /CW, /FUL ]
+max7219: &max7219
+        name: LED Driver
+        npins: 24
+        pins:
+                - DIN
+                - D0
+                - D4
+                - GND
+                - D6
+                - D2
+                - D3
+                - D7
+                - GND
+                - D5
+                - D1
+                - LOAD
+                - CLK
+                - A
+                - F
+                - B
+                - G
+                - ISET
+                - V+
+                - C
+                - E
+                - DP
+                - D
+                - DOUT
+max7221: *max7219

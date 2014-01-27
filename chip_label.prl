@@ -152,6 +152,7 @@ sub genchip {
     $canvas->copy($nc,11,($height - $th) / 2,0,0,$tw,$th);
 
 
+    $name = "r_$name" if $invert;
     PTouchOut->output($canvas, lc "out/$name.png");
 }
 
