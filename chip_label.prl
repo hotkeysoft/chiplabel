@@ -63,17 +63,8 @@ sub loadChipDbFile {
     %yaml = (%yaml, %n);
 }
 
-loadChipDbFile 'chipdb-master/4017.yaml';
-loadChipDbFile 'chipdb-master/4013.yaml';
-loadChipDbFile 'chipdb-master/7474.yaml';
-loadChipDbFile 'chipdb-master/4093.yaml';
-loadFile 'chips/4000.yaml';
-loadFile 'chips/7400.yaml';
-loadFile 'chips/power.yaml';
-loadFile 'chips/display.yaml';
-loadFile 'chips/chips.yaml';
-loadFile 'chips/mcu.yaml';
-loadFile 'chips/opamps.yaml';
+map { loadChipDbFile "chipdb-master/$_.yaml" } qw/4017 4013 7474 4093/;
+map { loadFile "chips/$_.yaml" } qw/4000 7400 power display chips mcu opamps/;
 
 my %family;
 for (values %yaml) {

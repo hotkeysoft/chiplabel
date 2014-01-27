@@ -1,6 +1,6 @@
 package GdUtil;
 use Exporter 'import';
-@EXPORT_OK = qw/crop_centered drawtext createcode_qr createcode_dm writepng hcat vcat stretch hspace vspace drawtext2/;
+@EXPORT_OK = qw/crop_centered drawtext createcode_qr createcode_dm writepng hcat vcat stretch hspace vspace drawtext2 new_image/;
 %EXPORT_TAGS = ( all => \@EXPORT_OK );
 use strict;
 use warnings;
