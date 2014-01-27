@@ -70,6 +70,7 @@ loadChipDbFile 'chipdb-master/4093.yaml';
 loadFile 'chips/4000.yaml';
 loadFile 'chips/7400.yaml';
 loadFile 'chips/power.yaml';
+loadFile 'chips/display.yaml';
 loadFile 'chips/chips.yaml';
 loadFile 'chips/mcu.yaml';
 loadFile 'chips/opamps.yaml';
