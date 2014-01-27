@@ -2,10 +2,20 @@ family: 4000
 
 4001:
     name: NOR
-    pins: [1A, 2A, OA, OB, 1B, 2B, Vss, 1C, 2C, OC, OD, 1D, 2D, Vdd ]
+    pins: [1A, 1B, 1Y, 2Y, 2A, 2B, Vss, 3A, 3B, 3Y, 4Y, 4A, 4B, Vdd ]
+    units:
+        1: [1,2,3]
+        2: [4,5,6]
+        3: [8,9,10]
+        4: [11,12,13]
 4011:
     name: NAND
-    pins: [1A, 2A, OA, OB, 1B, 2B, Vss, 1C, 2C, OC, OD, 1D, 2D, Vdd ]
+    pins: [1A, 1B, 1Y, 2Y, 2A, 2B, Vss, 3A, 3B, 3Y, 4Y, 4A, 4B, Vdd ]
+    units:
+        1: [1,2,3]
+        2: [4,5,6]
+        3: [8,9,10]
+        4: [11,12,13]
 4040:
     name: Counter
     pins: [Q12, Q6, Q5, Q7, Q4, Q3, Q2, Vss, Q1, /CLK, RST, Q9, Q8, Q10, Q11, Vdd ]
@@ -16,8 +26,11 @@ family: 4000
     name: Multiplexer
     pins: [B1, B0, C1, Cn, C0, /E, Vee, GND, SC, SB, SA, A0, A1, An, Bn, Vcc ]
 4538:
-        name: Multivibrator
-        pins: [ Vss, xA, /RsA, Aa, /Ba, Qa, /Qa, Vss, /Qb, Qb, /Bb, Ab, /RsB, XB, Vss, Vdd ]
+    name: Dual Monostable
+    pins: [ Vss, RC, /Rs, A, /B, Q, /Q, Vss, /Q, Q, /B, A, /Rs, RC, Vss, Vdd ]
+    units:
+        1: [1,2,3,4,5,6,7]
+        2: [9,10,11,12,13,14,15]
 4504:
         name: LevelShift
         pins: [ Vcc, Ao, Ai, Bo, Bi, Co, Ci, Vss, Di, Do, Ei, Eo, MOD, Fi, Fo, Vdd ]
