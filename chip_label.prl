@@ -11,27 +11,28 @@ use Data::Dumper;
 use feature qw(switch);
 
 use GdUtil qw/:all/;
-use PTouch qw/pixels PIX_PER_MM/;
+use PTouchOut;
 use YAML;
 
 my $outfile;
 
 # tape width in mm
-my $tapewidth = 6;
 my $pin_spacing = 2.54; # mm
 my $offset = 1.0; # mm
-my $force = 0;
 my $all = 0;
 my @chip;
 my $tech;
+my $invert = 0;
+
+PTouchOut::defaults(width => 6);
 
 GetOptions(
-    "w=n" => \$tapewidth,  # width of tape
+    PTouchOut->opts,
     "o=s" => \$outfile,
-    "force" => \$force,
     "c=s" => \@chip,
     "a" => \$all,
     "t" => \$tech,
+    "i" => \$invert,
     ) or die "invalid options";
 
 my %yaml;
@@ -75,12 +76,10 @@ loadFile 'chips/opamps.yaml';
 
 my %family;
 for (values %yaml) {
-    $family{$_->{family}}{$_->{key}} = $_;
+    $family{$_->{family}}{$_->{key}} = $_ if exists $_->{family};
 }
 
-print Dumper(\%yaml);
-
-my $height = pixels($tapewidth);
+my $height = PTouchOut->pixels;
 
 sub genchip {
     my ($ch) = @_;
@@ -115,19 +114,23 @@ sub genchip {
     return if defined $yaml{$ch}{status} &&
         $yaml{$ch}{status} eq 'disable';
 
-    my $canvas = GD::Image->new(PIX_PER_MM*($offset*2 + $pin_spacing * (@pins/2 - 1)), $height);
+    my $canvas = GD::Image->new(PTouchOut->mmtopix($offset*2 + $pin_spacing * (@pins/2 - 1)), $height);
     $canvas->useFontConfig(1);
     my $bg = $canvas->colorAllocate(255,255,255);
     my $fg = $canvas->colorAllocate(0,0,0);
 
 # pin 0
-    $canvas->filledRectangle(0,$height / 2 - 3, 2, $height / 2 + 3,$fg);
-    $canvas->filledEllipse(2,$height / 2,7,7,$fg);
+    $canvas->filledRectangle(0,$height / 2 - 3, 3, $height / 2 + 3,$fg);
+    my $inv = $invert ? -3 : 0;
+    $canvas->filledRectangle(3,$height / 2 + -3*$invert, 6, $height / 2 + -3*$invert + 3,$fg);
+#    $canvas->filledEllipse(2,$height / 2,7,7,$fg);
 
-
-    my $cx = $offset * PIX_PER_MM;
+    my $cx = PTouchOut->mmtopix($offset);
     for my $pl (1 .. @pins / 2) {
         my $pr = @pins - $pl + 1;
+        if ($invert) {
+            ($pl, $pr) = ($pr, $pl);
+        }
 
         sub dpin {
             my ($cx,$canvas,$pn,$lr) = @_;
@@ -141,14 +144,15 @@ sub genchip {
         dpin $cx,$canvas,$pins[$pl - 1],1;
         dpin $cx,$canvas,$pins[$pr - 1],0;
 
-        $cx += $pin_spacing * PIX_PER_MM;
+        $cx += PTouchOut->mmtopix($pin_spacing);
     }
 
     my $nc = drawtext2($lname, font => GD::Font->Tiny);
     my ($tw,$th) = $nc->getBounds();
     $canvas->copy($nc,11,($height - $th) / 2,0,0,$tw,$th);
 
-    writepng($canvas , lc "out/$name.png");
+
+    PTouchOut->output($canvas, lc "out/$name.png");
 }
 
 genchip($_) for @chip;
@@ -166,5 +170,6 @@ __END__
    -c chip           chip name as specified in chips.yaml
    -a                generate pngs for all chips in the file
    -t (hc,ttl,ac,cd) technology of 74 or 4000 series logic
+   -i                invert label, for dead bug soldering.
 
 output placed in out/ directory.

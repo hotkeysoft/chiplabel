@@ -4,7 +4,7 @@ use warnings;
 use v5.10;
 use fields  qw/width output margin force minquality scale datamatrix count fontsize font/;
 
-use PTouch;
+use PTouch qw/PIX_PER_MM/;
 use GdUtil qw/:all/;
 use Carp;
 use List::Util qw/max/;
@@ -20,10 +20,14 @@ my %default_values = (
     fontsize => 18
 );
 
+sub defaults {
+    %default_values = (%default_values, @_);
+}
+
 sub new {
     my $self = shift;
     $self = fields::new($self) unless ref $self;
-    %$self = %default_values;
+    %$self = (%default_values,@_);
     hspace(1)->useFontConfig(1);
     return $self;
 }
@@ -38,7 +42,7 @@ sub self {
 sub opts {
     my ($self) = self(@_);
     return (
-    "w=n" => \$self->{width},  # width of tape
+    "w=f" => \$self->{width},  # width of tape
     "o=s" => \$self->{output},
     "force" => \$self->{force},
     );
@@ -64,6 +68,11 @@ sub opts_text {
 sub pixels {
     my ($self) = self(@_);
     return PTouch::pixels($self->{width});
+}
+
+sub mmtopix {
+    my ($self,$mm) = self(@_);
+    return PIX_PER_MM*$mm if defined $mm;
 }
 
 sub output {
