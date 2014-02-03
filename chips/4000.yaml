@@ -25,6 +25,9 @@ family: 4000
 4053:
     name: Multiplexer
     pins: [B1, B0, C1, Cn, C0, /E, Vee, GND, SC, SB, SA, A0, A1, An, Bn, Vcc ]
+4066:
+        name: Analog Switch
+        pins: [ SA, SA, SB, SB, CB, CC, Vss, SC, SC, SD, SD, CD, CA, Vdd ]
 4538:
     name: Dual Monostable
     pins: [ Vss, RC, /Rs, A, /B, Q, /Q, Vss, /Q, Q, /B, A, /Rs, RC, Vss, Vdd ]

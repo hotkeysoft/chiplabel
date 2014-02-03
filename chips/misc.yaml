@@ -1,0 +1,19 @@
+gofbo:
+    name: _none_
+    npins: 14
+    padding: 4
+    rotation: 90
+    pins: [S,R,T,BR,BB,BB,BR, S1,S2,T,R,S,GND,GND]
+    units:
+        - [1,2,3]
+        - [4,5]
+        - [6,7]
+        - [10,11,12]
+
+gofpo:
+    name: _none_
+    rotation: 90
+    npins: 7
+    padding: 4
+    type: sil
+    pins: ['+2Vb|Vb', '+Vb', 'GND', '-Vb|GND', '+5V', '+3.3V', 'GND']

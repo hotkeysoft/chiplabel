@@ -16,7 +16,7 @@ my %WIDTH = (
      24=>128,
      );
 
-use constant PIX_PER_MM => 7.0;
+use constant PIX_PER_MM => 7.2;
 
 sub pixels {
     return undef unless defined $_[0];

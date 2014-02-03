@@ -37,3 +37,7 @@ attiny44a:
         - A1
         - A0
         - GND
+msp430g2001:
+        regex: "msp430g2.01"
+        npins: 14
+        pins: [DVcc, P1.0, P1.1, P1.2, P1.3, P1.4, P1.5, P1.6, P1.7, /RST, TEST, XOUT, XIN, DVss]

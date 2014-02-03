@@ -58,13 +58,13 @@ sub loadChipDbFile {
         $pins[$h->{num} - 1] = $h->{sym};
     }
     map { if (/\~/) { s/\~//g; s/^/\// } } @pins;
-    my %n = ($name => { key => $name, name => undef, pins => \@pins, family => $yaml->{family}});
+    my %n = ($name => { key => $name, name => undef, npins => $count, pins => \@pins, family => $yaml->{family}});
 #    print Dumper(\%n);
     %yaml = (%yaml, %n);
 }
 
-map { loadChipDbFile "chipdb-master/$_.yaml" } qw/4017 4013 7474 4093/;
-map { loadFile "chips/$_.yaml" } qw/4000 7400 power display chips mcu opamps/;
+map { loadChipDbFile "chipdb-master/$_.yaml" } qw/4017 4013 7474 4093 4516/;
+map { loadFile "chips/$_.yaml" } qw/misc 4000 7400 power display chips mcu opamps/;
 
 my %family;
 for (values %yaml) {
@@ -91,20 +91,27 @@ sub genchip {
             } else {
                 if (exists $yaml{"74$p"}) {
                     $ch = "74$p";
-                        @pins = @{$yaml{$ch}{pins}};
-                    }
+                    @pins = @{$yaml{$ch}{pins}};
                 }
             }
-        } else {
+        }
+    } else {
         @pins = @{$yaml{$ch}{pins}};
         $name = $ch;
     }
+    if (defined($yaml{$ch}{npins}) and ($yaml{$ch}{npins} + 0) != scalar @pins) {
+        print "pin mismatch.";
+        print Dumper $yaml{$ch};
+        return;
+    }
     my $lname = $name;
+    my $type = $yaml{$ch}{type} // 'dil';
+    @pins = (@pins,@pins) if $type eq 'sil';
     $lname = "$name $yaml{$ch}{name}" if defined $yaml{$ch}{name};
     print join " ", $lname, @pins, "\n";
-    @pins or die "no pins!";
+    @pins or (print Dumper $yaml{$ch}) and die "no pins!";
     return if defined $yaml{$ch}{status} &&
-        $yaml{$ch}{status} eq 'disable';
+    $yaml{$ch}{status} eq 'disable';
 
     my $canvas = GD::Image->new(PTouchOut->mmtopix($offset*2 + $pin_spacing * (@pins/2 - 1)), $height);
     $canvas->useFontConfig(1);
@@ -112,10 +119,11 @@ sub genchip {
     my $fg = $canvas->colorAllocate(0,0,0);
 
 # pin 0
-    $canvas->filledRectangle(0,$height / 2 - 3, 3, $height / 2 + 3,$fg);
-    my $inv = $invert ? -3 : 0;
-    $canvas->filledRectangle(3,$height / 2 + -3*$invert, 6, $height / 2 + -3*$invert + 3,$fg);
-#    $canvas->filledEllipse(2,$height / 2,7,7,$fg);
+    unless ($yaml{$ch}{name} eq '_none_') {
+        $canvas->filledRectangle(0,$height / 2 - 3, 3, $height / 2 + 3,$fg);
+        my $inv = $invert ? -3 : 0;
+        $canvas->filledRectangle(3,$height / 2 + -3*$invert, 6, $height / 2 + -3*$invert + 3,$fg);
+    }
 
     my $cx = PTouchOut->mmtopix($offset);
     for my $pl (1 .. @pins / 2) {
@@ -125,24 +133,30 @@ sub genchip {
         }
 
         sub dpin {
-            my ($cx,$canvas,$pn,$lr) = @_;
+            my ($cx,$canvas,$pn,$lr,$yaml) = @_;
             my $bar = $pn =~ s/^\///;
+            my $padding = $yaml{padding} // 0;
             my $t = drawtext2($pn, font => GD::Font->Tiny, overbar => $bar );
-            $t = $t->copyRotate270();
+            if (exists $yaml{rotate} and $yaml{rotate} == 90) {
+                $t = $t->copyRotate90();
+            } else {
+                $t = $t->copyRotate270();
+            }
             my ($tw,$th) = $t->getBounds();
-            $canvas->copy($t,$cx - $tw / 2 ,$lr ? ($height - $th) : 0,0,0,$tw,$th);
+            $canvas->copy($t,$cx - $tw / 2 ,$lr ? ($height - $th) -$padding : $padding,0,0,$tw,$th);
         }
 
-        dpin $cx,$canvas,$pins[$pl - 1],1;
-        dpin $cx,$canvas,$pins[$pr - 1],0;
+        dpin $cx,$canvas,$pins[$pr - 1],1,$yaml{$ch};
+        dpin $cx,$canvas,$pins[$pl - 1],0,$yaml{$ch} unless ($yaml{$ch}{type} // '') eq 'sil';
 
         $cx += PTouchOut->mmtopix($pin_spacing);
     }
 
-    my $nc = drawtext2($lname, font => GD::Font->Tiny);
-    my ($tw,$th) = $nc->getBounds();
-    $canvas->copy($nc,11,($height - $th) / 2,0,0,$tw,$th);
-
+    unless ($yaml{$ch}{name} eq '_none_') {
+        my $nc = drawtext2($lname, font => GD::Font->Tiny) unless $yaml{$ch}{name} eq '_none_';
+        my ($tw,$th) = $nc->getBounds();
+        $canvas->copy($nc,11,($height - $th) / 2,0,0,$tw,$th);
+    }
 
     $name = "r_$name" if $invert;
     PTouchOut->output($canvas, lc "out/$name.png");
