@@ -47,7 +47,8 @@ sub loadFile {
     %yaml = (%yaml, %$yaml);
 }
 sub loadChipDbFile {
-    my $data = read_file($_[0]) or die "$!: $_[0]";
+    print(STDERR "$!: $_[0]\n"),return unless -e $_[0];
+    my $data = read_file($_[0]);
     my $name = $_[0];
     $name =~ s/^(.*\/)?(.*)\.yaml$/$2/;
     $data =~ s/^\.\.\.$//m;
