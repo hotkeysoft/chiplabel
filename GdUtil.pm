@@ -31,6 +31,12 @@ sub crop_centered ($@) {
     $nimg->copy($img,max(0,$cw),max(0,$ch),-min(0,$cw),-min(0,$ch),$nw,$nh);
     return $nimg;
 }
+sub rectangle ($@) {
+    my ($img,$x,$y,$w,$h,$fg) = @_;
+    return if $w <= 0 || $h <= 0;
+    $img->filledRectangle($x,$y,$x+$w - 1, $y + $h - 1, $fg);
+    return $img;
+}
 
 sub stretch ($@) {
     my $img = shift;

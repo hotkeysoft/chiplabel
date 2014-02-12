@@ -79,7 +79,8 @@ sub output {
     my ($self,$canvas,$fn) = self(@_);
     my ($w,$h) = $canvas->getBounds();
     croak "Final output is too big for tape width: $h > $self->pixels" if $h > $self->pixels;
-    writepng(crop_centered($canvas, undef, $self->pixels), $fn // $self->{output});
+#    writepng(crop_centered($canvas, undef, $self->pixels), $fn // $self->{output});
+    writepng($canvas, $fn // $self->{output});
 }
 
 sub outputs {

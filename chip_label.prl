@@ -119,7 +119,7 @@ sub genchip {
     my $fg = $canvas->colorAllocate(0,0,0);
 
 # pin 0
-    unless ($yaml{$ch}{name} eq '_none_') {
+    unless (defined $yaml{$ch}{name} and $yaml{$ch}{name} eq '_none_') {
         $canvas->filledRectangle(0,$height / 2 - 3, 3, $height / 2 + 3,$fg);
         my $inv = $invert ? -3 : 0;
         $canvas->filledRectangle(3,$height / 2 + -3*$invert, 6, $height / 2 + -3*$invert + 3,$fg);
@@ -133,15 +133,15 @@ sub genchip {
         }
 
         sub dpin {
-            my ($cx,$canvas,$pn,$lr,$yaml) = @_;
+            my ($cx,$canvas,$pn,$lr,$yml) = @_;
             my $bar = $pn =~ s/^\///;
-            my $padding = $yaml{padding} // 0;
             my $t = drawtext2($pn, font => GD::Font->Tiny, overbar => $bar );
-            if (exists $yaml{rotate} and $yaml{rotate} == 90) {
+            if (exists $yml->{rotation} and $yml->{rotation} == 90) {
                 $t = $t->copyRotate90();
             } else {
                 $t = $t->copyRotate270();
             }
+            my $padding = $yml->{padding} // 0;
             my ($tw,$th) = $t->getBounds();
             $canvas->copy($t,$cx - $tw / 2 ,$lr ? ($height - $th) -$padding : $padding,0,0,$tw,$th);
         }
@@ -152,8 +152,8 @@ sub genchip {
         $cx += PTouchOut->mmtopix($pin_spacing);
     }
 
-    unless ($yaml{$ch}{name} eq '_none_') {
-        my $nc = drawtext2($lname, font => GD::Font->Tiny) unless $yaml{$ch}{name} eq '_none_';
+    unless (defined $yaml{$ch}{name} and $yaml{$ch}{name} eq '_none_') {
+        my $nc = drawtext2($lname, font => GD::Font->Tiny);
         my ($tw,$th) = $nc->getBounds();
         $canvas->copy($nc,11,($height - $th) / 2,0,0,$tw,$th);
     }

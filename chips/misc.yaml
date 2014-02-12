@@ -1,7 +1,7 @@
 gofbo:
     name: _none_
     npins: 14
-    padding: 4
+    padding: 2
     rotation: 90
     pins: [S,R,T,BR,BB,BB,BR, S1,S2,T,R,S,GND,GND]
     units:
@@ -14,6 +14,6 @@ gofpo:
     name: _none_
     rotation: 90
     npins: 7
-    padding: 4
+    padding: 2
     type: sil
-    pins: ['+2Vb|Vb', '+Vb', 'GND', '-Vb|GND', '+5V', '+3.3V', 'GND']
+    pins: ['+2Vb', '+Vb', 'GND', '-Vb', '+5V', '+3.3V', 'GND']

@@ -1,0 +1,42 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+
+use Getopt::Long qw/:config auto_help gnu_getopt bundling/;
+use Pod::Usage;
+use GdUtil qw/:all/;
+use PTouchOut;
+use PTouch qw/VPIX_PER_MM PIX_PER_MM/;
+
+my @text;
+
+GetOptions(
+    PTouchOut->opts,
+    PTouchOut->opts_text,
+    ) or die "invalid options";
+
+
+my $height = VPIX_PER_MM*3.0;
+my $fheight = VPIX_PER_MM*5.0;
+
+my ($cgd,$fg) = new_image(210,35);
+GdUtil::rectangle($cgd,5,2,200,20,$fg);
+GdUtil::rectangle($cgd,5,2,2,30,$fg);
+GdUtil::rectangle($cgd,5+50,2,2,30,$fg);
+GdUtil::rectangle($cgd,5+100,2,2,30,$fg);
+GdUtil::rectangle($cgd,5+150,2,2,30,$fg);
+#my ($cgd,$fg) = new_image(PIX_PER_MM*30,$fheight);
+#GdUtil::rectangle($cgd,0,$fheight/2 - $height/2, PIX_PER_MM*30, $fheight/2 + $height/2,$fg);
+#GdUtil::rectangle($cgd,0,0,1, $fheight,$fg);
+#GdUtil::rectangle($cgd,PIX_PER_MM*10,0,PIX_PER_MM*10+1, $fheight,$fg);
+#GdUtil::rectangle($cgd,PIX_PER_MM*20,0,PIX_PER_MM*20+1, $fheight,$fg);
+#GdUtil::rectangle($cgd,PIX_PER_MM*30,0,PIX_PER_MM*30+1, $fheight,$fg);
+PTouchOut->output($cgd);
+
+__END__
+
+=head1 SYNOPSIS
+
+ Options:
+   --help            brief help message
+   -w n              specify tape width in mm
