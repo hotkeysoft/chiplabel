@@ -21,13 +21,6 @@ my $qrtext = "";
 #my $number = "626-379-6981";
 #my $email = "john\@foo.net";
 
-my $name = "Kaley Schiltz";
-my $number = "626-226-8498";
-my $email = "ekaley\@gmail.com";
-$qrtext = "MECARD:N:Schiltz,Kaley;TEL:$number;EMAIL:$email;;";
-
-#$text = "\nCaroline Corrigan\n323-806-3097\ncaroline.corrigan\@gmail.com";
-#$qrtext = "MECARD:N:Corrigan,Caroline;TEL:323-806-3097;EMAIL:caroline.corrigan\@gmail.com;;";
 
 # tape width in mm
 my $tapewidth = 12;
