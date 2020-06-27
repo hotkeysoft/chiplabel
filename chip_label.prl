@@ -62,11 +62,9 @@ sub loadChipDbFile {
     }
     map { if (/\~/) { s/\~//g; s/^/\// } } @pins;
     my %n = ($name => { key => $name, name => undef, npins => $count, pins => \@pins, family => $yaml->{family}});
-#    print Dumper(\%n);
     %yaml = (%yaml, %n);
 }
 
-#map { loadChipDbFile "chipdb-master/$_.yaml" } qw/4017 4013 7474 4093 4516/;
 map { loadFile "chips/$_.yaml" } qw/misc 4000 7400 power display chips mcu opamps/;
 
 my %family;
@@ -128,7 +126,7 @@ sub genchip {
         my $inv = $invert ? 0 : -3;
         $canvas->filledRectangle(3,$height / 2 + -3*(!$invert), 6, $height / 2 + -3*(!$invert) + 3,$fg);
     }
-    
+
     if ($frame) {
         $canvas->rectangle(0, 0, PTouchOut->mmtopix($width)-1, $height-1, $fg);
     }
@@ -143,7 +141,7 @@ sub genchip {
         sub dpin {
             my ($cx,$canvas,$pn,$lr,$yml) = @_;
             my $bar = $pn =~ s/^\///;
-            my $t = drawtext2($pn, font => GD::Font->Tiny, overbar => $bar );
+            my $t = drawtext($pn, font => GD::Font->Tiny, overbar => $bar );
             if (exists $yml->{rotation} and $yml->{rotation} == 90) {
                 $t = $t->copyRotate90();
             } else {
@@ -162,7 +160,7 @@ sub genchip {
     }
 
     unless (defined $yaml{$ch}{name} and $yaml{$ch}{name} eq '_none_') {
-        my $nc = drawtext2($lname, font => GD::Font->Tiny);
+        my $nc = drawtext($lname, font => GD::Font->Tiny);
         my ($tw,$th) = $nc->getBounds();
         $canvas->copy($nc,11,($height - $th) / 2,0,0,$tw,$th);
     }
