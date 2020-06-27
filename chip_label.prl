@@ -23,6 +23,7 @@ my $all = 0;
 my @chip;
 my $tech;
 my $invert = 0;
+my $frame = 0;
 
 PTouchOut::defaults(width => 6);
 
@@ -33,6 +34,7 @@ GetOptions(
     "a" => \$all,
     "t" => \$tech,
     "i" => \$invert,
+    "f" => \$frame,
     ) or die "invalid options";
 
 my %yaml;
@@ -114,6 +116,7 @@ sub genchip {
     return if defined $yaml{$ch}{status} &&
     $yaml{$ch}{status} eq 'disable';
 
+    my $width = $offset*2 + $pin_spacing * (@pins/2 - 1);
     my $canvas = GD::Image->new(PTouchOut->mmtopix($offset*2 + $pin_spacing * (@pins/2 - 1)), $height);
     $canvas->useFontConfig(1);
     my $bg = $canvas->colorAllocate(255,255,255);
@@ -122,14 +125,18 @@ sub genchip {
 # pin 0
     unless (defined $yaml{$ch}{name} and $yaml{$ch}{name} eq '_none_') {
         $canvas->filledRectangle(0,$height / 2 - 3, 3, $height / 2 + 3,$fg);
-        my $inv = $invert ? -3 : 0;
-        $canvas->filledRectangle(3,$height / 2 + -3*$invert, 6, $height / 2 + -3*$invert + 3,$fg);
+        my $inv = $invert ? 0 : -3;
+        $canvas->filledRectangle(3,$height / 2 + -3*(!$invert), 6, $height / 2 + -3*(!$invert) + 3,$fg);
+    }
+    
+    if ($frame) {
+        $canvas->rectangle(0, 0, PTouchOut->mmtopix($width)-1, $height-1, $fg);
     }
 
     my $cx = PTouchOut->mmtopix($offset);
     for my $pl (1 .. @pins / 2) {
         my $pr = @pins - $pl + 1;
-        if ($invert) {
+        if (!$invert) {
             ($pl, $pr) = ($pr, $pl);
         }
 
@@ -144,6 +151,7 @@ sub genchip {
             }
             my $padding = $yml->{padding} // 0;
             my ($tw,$th) = $t->getBounds();
+            $padding += $frame ? 2 : 0;
             $canvas->copy($t,$cx - $tw / 2 ,$lr ? ($height - $th) -$padding : $padding,0,0,$tw,$th);
         }
 
@@ -179,5 +187,6 @@ __END__
    -a                generate pngs for all chips in the file
    -t (hc,ttl,ac,cd) technology of 74 or 4000 series logic
    -i                invert label, for dead bug soldering.
+   -f                draw a frame around the chip
 
 output placed in out/ directory.
