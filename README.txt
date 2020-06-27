@@ -4,4 +4,4 @@ usage:
 
 this code is placed in the public domain by John Meacham.
 john@repetae.net  http://notanumber.net/
-code imported from darcs get http://repetae.net/repos/clabel
+code imported from darcs repository http://repetae.net/repos/clabel
