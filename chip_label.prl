@@ -64,7 +64,7 @@ sub loadChipDbFile {
     %yaml = (%yaml, %n);
 }
 
-map { loadChipDbFile "chipdb-master/$_.yaml" } qw/4017 4013 7474 4093 4516/;
+#map { loadChipDbFile "chipdb-master/$_.yaml" } qw/4017 4013 7474 4093 4516/;
 map { loadFile "chips/$_.yaml" } qw/misc 4000 7400 power display chips mcu opamps/;
 
 my %family;
